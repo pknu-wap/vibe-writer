@@ -1,0 +1,2 @@
+# vibe-writer
+2026-1 WAP PROJECT WEP 1 TEAM
