@@ -13,6 +13,17 @@ def extract_audio(video_path):
     
     return audio_path
 
+def get_still_cut(video_path, timestamp):
+    video = VideoFileClip(video_path)
+    frame = video.get_frame(timestamp)
+    video.close()
+    
+    return frame
+
+
 if __name__ == "__main__":
     result = extract_audio("C:/Users/jine7/Desktop/구동하.mp4")
     print(result)
+
+    frame = get_still_cut("C:/Users/jine7/Desktop/구동하.mp4", 3.0)
+    print(frame.shape)
