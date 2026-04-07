@@ -5,7 +5,7 @@ st.set_page_config(page_title="VIBE-WRITER", layout="centered")
 
 if "page" not in st.session_state:
     st.session_state["page"] = "upload"
-
+#css
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;600;700&display=swap');
@@ -107,7 +107,7 @@ st.markdown("""
 
 def film_holes(n=10):
     return ''.join(['<div class="film-hole"></div>'] * n)
-
+#html
 if st.session_state["page"] == "upload":
     st.markdown(f"""
     <div class="nav">
