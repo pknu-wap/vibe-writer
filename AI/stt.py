@@ -44,9 +44,8 @@ def analyze_stt(audio_path):
 
         rec_result = model_emo.generate(
             samples,
-            output_dir="./outputs",
             granularity="utterance",   
-            extract_embedding=False
+            extract_embedding=False,
         )
 
         video_sub[i]['angry'] = rec_result[0]['scores'][0]
