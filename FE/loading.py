@@ -2,15 +2,19 @@ import streamlit as st
 import time
 from PIL import Image
 
-blank_icon = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
+HOLES = '<div class="hole"></div>' * 9
+FILM_SIDES = f'<div class="holes left">{HOLES}</div><div class="holes right">{HOLES}</div>'
 
-st.set_page_config(
-    page_title=" ",
-    page_icon=blank_icon,
-    layout="centered"
-)
+STEPS = [
+    ("📂 파일 로드 중",   0.5),
+    ("🎙 오디오 추출 중", 0.8),
+    ("📝 STT 변환 중",    1.2),
+    ("🧠 감정 분석 중",   1.0),
+    ("✍️ 자막 생성 중",   0.8),
+]
 
-st.markdown("""
+def show_loading():
+    st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap');
 
@@ -108,24 +112,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-HOLES = '<div class="hole"></div>' * 9
-FILM_SIDES = f'<div class="holes left">{HOLES}</div><div class="holes right">{HOLES}</div>'
+    card = st.empty()
 
-STEPS = [
-    ("📂 파일 로드 중",   0.5),
-    ("🎙 오디오 추출 중", 0.8),
-    ("📝 STT 변환 중",    1.2),
-    ("🧠 감정 분석 중",   1.0),
-    ("✍️ 자막 생성 중",   0.8),
-]
+    for i, (label, delay) in enumerate(STEPS):
+        pct = (i + 1) / len(STEPS)
+        pct_int = int(pct * 100)
 
-card = st.empty()
-
-for i, (label, delay) in enumerate(STEPS):
-    pct = (i + 1) / len(STEPS)
-    pct_int = int(pct * 100)
-
-    card.markdown(f"""
+        card.markdown(f"""
     <div class="screen-wrap">
         <div class="film-card">
             {FILM_SIDES}
@@ -139,4 +132,4 @@ for i, (label, delay) in enumerate(STEPS):
     </div>
     """, unsafe_allow_html=True)
 
-    time.sleep(delay)
+        time.sleep(delay)

@@ -1,12 +1,7 @@
 import streamlit as st
-from loading import show_loading
 
-st.set_page_config(page_title="VIBE-WRITER", layout="centered")
-
-if "page" not in st.session_state:
-    st.session_state["page"] = "upload"
-
-st.markdown("""
+def show_upload():
+    st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;600;700&display=swap');
 
@@ -105,10 +100,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def film_holes(n=10):
-    return ''.join(['<div class="film-hole"></div>'] * n)
+    def film_holes(n=10):
+        return ''.join(['<div class="film-hole"></div>'] * n)
 
-if st.session_state["page"] == "upload":
     st.markdown(f"""
     <div class="nav">
         <span class="nav-logo">VIBE - WRITER</span>
@@ -126,17 +120,19 @@ if st.session_state["page"] == "upload":
             </svg>
         </div>
         <div class="card-title">영상을 여기에 첨부 해 주세요.</div>
-        <div class="card-hint">새로형(9:16), 60초 이내, MP4</div>
+        <div class="card-hint">세로형(9:16), 60초 이내, MP4</div>
     </div>
     """, unsafe_allow_html=True)
 
     col_l, col_c, col_r = st.columns([1, 4, 1])
     with col_c:
-        uploaded_file = st.file_uploader("영상 선택하기", type=["mp4"], label_visibility="collapsed")
+        # uploader_placeholder를 사용하여 렌더링 시점을 제어합니다.
+        uploader_placeholder = st.empty()
+        uploaded_file = uploader_placeholder.file_uploader("영상 선택하기", type=["mp4"], label_visibility="collapsed")
+        
         if uploaded_file:
+            # 파일이 들어오면 uploader를 즉시 비워서 잔상을 방지합니다.
+            uploader_placeholder.empty()
             st.session_state["file"] = uploaded_file
             st.session_state["page"] = "loading"
             st.rerun()
-
-elif st.session_state["page"] == "loading":
-    show_loading()
