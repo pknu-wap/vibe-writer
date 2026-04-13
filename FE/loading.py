@@ -2,6 +2,9 @@ import streamlit as st
 import time
 from PIL import Image
 
+def show_loading():
+    st.markdown("<style>[data-testid='stSidebar'],[data-testid='collapsedControl']{display:none}</style>", unsafe_allow_html=True)
+
 blank_icon = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
 
 st.set_page_config(
@@ -140,3 +143,6 @@ for i, (label, delay) in enumerate(STEPS):
     """, unsafe_allow_html=True)
 
     time.sleep(delay)
+
+st.session_state["loading_done"] = True
+st.switch_page("pages/edit.py")
