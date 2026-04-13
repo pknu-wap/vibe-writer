@@ -4,7 +4,8 @@ from PIL import Image
 
 blank_icon = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
 
-st.set_page_config(
+def show_loading():
+    st.set_page_config(
     page_title=" ",
     page_icon=blank_icon,
     layout="centered"
