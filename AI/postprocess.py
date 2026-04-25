@@ -3,20 +3,40 @@ from funasr.utils.load_utils import load_audio_text_image_video, extract_fbank
 import torch
 
 
-def fix_imbalance(result):
-    probs = result.get("emotion_probs", {})
-    if not probs:
-        return result
+def map_emotion(emotion: str) -> str:
+    emotion = emotion.lower()
 
-    top_emotion = max(probs, key=probs.get)
-    top_score = probs[top_emotion]
+    if emotion in ["happy", "surprised"]:
+        return "Happy"
+    elif emotion == "sad":
+        return "Sad"
+    elif emotion in ["angry", "disgusted", "fearful"]:
+        return "Angry"
+    elif emotion in ["neutral", "other", "unknown"]:
+        return "Neutral"
+    else:
+        return "Neutral"
 
-    if top_emotion == "Neutral" and top_score < 0.70:
-        sorted_items = sorted(probs.items(), key=lambda x: x[1], reverse=True)
-        if len(sorted_items) > 1:
-            result["emotion"] = sorted_items[1][0]
 
-    return result
+def fix_imbalance(scores: dict) -> str:
+    if not scores:
+        return "Neutral"
+
+    mapped_scores = {
+        "Happy": 0.0,
+        "Sad": 0.0,
+        "Angry": 0.0,
+        "Neutral": 0.0,
+    }
+
+    for emotion, score in scores.items():
+        mapped_emotion = map_emotion(emotion)
+        mapped_scores[mapped_emotion] += score
+
+    if mapped_scores["Neutral"] >= 0.70:
+        return "Neutral"
+
+    return max(mapped_scores, key=mapped_scores.get)
 
 
 def run_sensevoice_with_probs(audio_path):
@@ -53,7 +73,9 @@ def run_sensevoice_with_probs(audio_path):
     textnorm = "withitn" if use_itn else "woitn"
 
     language_query = model.embed(
-        torch.LongTensor([[model.lid_dict[language] if language in model.lid_dict else 0]]).to(speech.device)
+        torch.LongTensor(
+            [[model.lid_dict[language] if language in model.lid_dict else 0]]
+        ).to(speech.device)
     ).repeat(speech.size(0), 1, 1)
 
     textnorm_query = model.embed(
@@ -72,6 +94,7 @@ def run_sensevoice_with_probs(audio_path):
     speech_lengths += 3
 
     encoder_out, encoder_out_lens = model.encoder(speech, speech_lengths)
+
     if isinstance(encoder_out, tuple):
         encoder_out = encoder_out[0]
 
@@ -85,7 +108,14 @@ def run_sensevoice_with_probs(audio_path):
     }
 
     emo_position = 2
-    emo_token_ids = [emo_ids["Happy"], emo_ids["Sad"], emo_ids["Angry"], emo_ids["Neutral"]]
+
+    emo_token_ids = [
+        emo_ids["Happy"],
+        emo_ids["Sad"],
+        emo_ids["Angry"],
+        emo_ids["Neutral"],
+    ]
+
     emo_logits = rich_logits[0, emo_position, emo_token_ids]
     emo_probs = torch.softmax(emo_logits, dim=-1)
 
@@ -100,15 +130,18 @@ def run_sensevoice_with_probs(audio_path):
     x = ctc_logits[0, : encoder_out_lens[0].item(), :]
     yseq = x.argmax(dim=-1)
     yseq = torch.unique_consecutive(yseq, dim=-1)
+
     mask = yseq != model.blank_id
     token_int = yseq[mask].tolist()
     text = tokenizer.decode(token_int)
 
     top_emotion = max(emotion_probs, key=emotion_probs.get)
+    final_emotion = fix_imbalance(emotion_probs)
 
     result = {
         "text": text,
-        "emotion": top_emotion,
+        "raw_emotion": top_emotion,
+        "emotion": final_emotion,
         "emotion_probs": emotion_probs,
     }
 
@@ -125,7 +158,8 @@ if __name__ == "__main__":
     for emotion, score in result["emotion_probs"].items():
         print(f"{emotion}: {score:.6f}")
 
-    result = fix_imbalance(result)
+    print("=== raw emotion ===")
+    print(result["raw_emotion"])
 
     print("=== final emotion ===")
     print(result["emotion"])
