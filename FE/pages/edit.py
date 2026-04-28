@@ -5,8 +5,10 @@ st.set_page_config(page_title="VIBE - WRITER", layout="wide", initial_sidebar_st
 
 st.markdown("""
 <style>
-  .main .block-container { padding: 0 !important; max-width: 100% !important; }
-  header, footer { display: none !important; }
+  .main .block-container          { padding: 0 !important; max-width: 100% !important; }
+  header, footer                  { display: none !important; }
+  [data-testid="stSidebar"]        { display: none !important; }
+  [data-testid="collapsedControl"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -18,7 +20,7 @@ HTML_APP = """<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+#폰트 및 색상 수정 필요
   :root {
     --bg:         #0d0d0d;
     --panel:      #141414;
