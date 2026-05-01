@@ -2,14 +2,27 @@ import streamlit as st
 import time
 from PIL import Image
 
-blank_icon = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
+st.markdown("""
+<style>
+[data-testid="stSidebar"] {
+    display: none;
+}
+[data-testid="collapsedControl"] {
+    display: none;
+}
+</style>
+""", unsafe_allow_html=True)
 
+
+
+#수정 요청 반영
 def show_loading():
     st.set_page_config(
     page_title=" ",
-    page_icon=blank_icon,
+   
     layout="centered"
 )
+
 
 st.markdown("""
 <style>
@@ -113,11 +126,7 @@ HOLES = '<div class="hole"></div>' * 9
 FILM_SIDES = f'<div class="holes left">{HOLES}</div><div class="holes right">{HOLES}</div>'
 
 STEPS = [
-    ("📂 파일 로드 중",   0.5),
-    ("🎙 오디오 추출 중", 0.8),
-    ("📝 STT 변환 중",    1.2),
-    ("🧠 감정 분석 중",   1.0),
-    ("✍️ 자막 생성 중",   0.8),
+    ("자막을 영상에 입히는 중이에요", 1.5)
 ]
 
 card = st.empty()
@@ -141,3 +150,9 @@ for i, (label, delay) in enumerate(STEPS):
     """, unsafe_allow_html=True)
 
     time.sleep(delay)
+
+
+
+
+#화면 전환 코드 추가
+st.switch_page("pages/edit.py")
