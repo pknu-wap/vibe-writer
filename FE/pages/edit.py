@@ -1,320 +1,507 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="VIBE - WRITER", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
-  .main .block-container          { padding: 0 !important; max-width: 100% !important; }
-  header, footer                  { display: none !important; }
-  [data-testid="stSidebar"]        { display: none !important; }
-  [data-testid="collapsedControl"] { display: none !important; }
+html, body, .stApp {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.block-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+}
+
+header, footer,
+[data-testid="stSidebar"],
+[data-testid="collapsedControl"] {
+    display: none !important;
+}
+
+iframe {
+    width: 100vw !important;
+    border: none !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
-HTML_APP = """<!DOCTYPE html>
+
+html_code = """
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-#폰트 및 색상 수정 필요
-  :root {
-    --bg:         #0d0d0d;
-    --panel:      #141414;
-    --panel2:     #1a1a1a;
-    --border:     #2a2a2a;
-    --border2:    #333;
-    --text:       #e8e8e8;
-    --text-muted: #777;
-    --text-dim:   #555;
-    --pill-bg:    #1f1f1f;
-    --pill-active:#3a3a3a;
-  }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-  html, body {
+html, body {
+    width: 100%;
     height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
+    background: #222;
+    font-family: Arial, sans-serif;
     overflow: hidden;
-  }
+}
 
-  .app  { display: flex; flex-direction: column; height: 100vh; }
-  .main { display: grid; grid-template-columns: 220px 1fr 260px; flex: 1; overflow: hidden; }
+.app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #222;
+}
 
-  .titlebar {
-    display: flex; align-items: center; gap: 14px;
-    padding: 0 24px; height: 52px;
-    border-bottom: 1px solid var(--border); flex-shrink: 0;
-  }
-  .titlebar h1  { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
-  .titlebar .sub { font-size: 12px; color: var(--text-muted); }
+/* 상단 제목 */
+.header {
+    height: 105px;
+    background: white;
+    color: black;
+    border-top: 8px solid #222;
+    border-bottom: 1px solid black;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 0 30px;
+}
 
-  .panel {
-    background: var(--panel);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; overflow: hidden;
-  }
-  .panel.right { border-right: none; border-left: 1px solid var(--border); }
+.header h1 {
+    font-size: 44px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
 
-  .panel-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border); flex-shrink: 0;
-  }
-  .panel-title { font-size: 13px; font-weight: 500; }
+.header p {
+    font-size: 19px;
+}
 
-  .panel-body {
-    flex: 1; overflow-y: auto; padding: 14px;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-  .panel-body::-webkit-scrollbar { width: 4px; }
-  .panel-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+/* 본문 3분할 */
+.main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 400px 1fr 360px;
+    min-height: 0;
+}
 
-  .field       { display: flex; flex-direction: column; gap: 6px; }
-  .field-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+/* 왼쪽, 오른쪽 패널 */
+.side {
+    background: black;
+    color: white;
+}
 
-  .slider-row { display: flex; align-items: center; gap: 8px; }
-  input[type="range"] {
-    flex: 1; -webkit-appearance: none;
-    height: 3px; background: var(--border2); border-radius: 2px; outline: none; cursor: pointer;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 14px; height: 14px;
-    border-radius: 50%; background: #fff; border: 2px solid var(--border2); cursor: pointer;
-  }
-  .slider-val { font-size: 11px; color: var(--text-muted); min-width: 28px; text-align: right; }
+.side-title {
+    height: 55px;
+    background: white;
+    color: black;
+    border-bottom: 1px solid black;
+    padding: 16px 25px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-  .pill-group { display: flex; flex-wrap: nowrap; gap: 3px; }
-  .pill {
-    padding: 3px 8px; border-radius: 100px; font-size: 11px;
-    cursor: pointer; border: 1px solid var(--border2); background: var(--pill-bg);
-    color: var(--text-muted); transition: all 0.15s; user-select: none; white-space: nowrap;
-  }
-  .pill:hover  { border-color: #444; color: var(--text); }
-  .pill.active { background: var(--pill-active); border-color: #555; color: var(--text); }
 
-  .preview-area {
-    background: #1c1c1c;
-    display: flex; align-items: center; justify-content: center;
-  }
+.side-body {
+    padding: 30px 24px;
+}
 
-  .video-wrapper {
-    position: relative; width: 220px; height: 390px;
-    border-radius: 12px; overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  }
-  .video-bg {
-    width: 100%; height: 100%;
-    background: linear-gradient(160deg, #c4c4c4 0%, #a8a8a8 100%);
-  }
+.label {
+    font-size: 13px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
 
-  .subtitle-overlay {
-    position: absolute; left: 0; right: 0; padding: 0 10px;
-    text-align: center; line-height: 1.3; word-break: keep-all;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-    transition: color 0.3s, font-size 0.2s;
-  }
-  .subtitle-overlay.pos-bottom { bottom: 18px; }
-  .subtitle-overlay.pos-center { top: 50%; transform: translateY(-50%); }
-  .subtitle-overlay.pos-top    { top: 18px; }
+input[type="range"] {
+    width: 100%;
+}
 
-  @keyframes bounce { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-4px)} }
-  @keyframes shake  { 0%,100%{transform:translateX(0)}  25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
-  @keyframes fadein { 0%{opacity:0} 100%{opacity:1} }
+/* 버튼 */
+.btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
-  .subtitle-overlay.fx-bounce { animation: bounce 0.6s ease infinite; }
-  .subtitle-overlay.fx-shake  { animation: shake  0.4s ease infinite; }
-  .subtitle-overlay.fx-fade   { animation: fadein 1s   ease infinite alternate; }
-  .subtitle-overlay.fx-none   { animation: none; }
+#effectBtns {
+    flex-wrap: nowrap;
+}
 
-  .emotion-btn {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px; border-radius: 10px;
-    border: 1px solid var(--border2); background: var(--panel2);
-    cursor: pointer; transition: border-color 0.15s, background 0.15s; user-select: none;
-  }
-  .emotion-btn:hover  { border-color: #444; background: #222; }
-  .emotion-btn.active { border-color: #555; background: #252525; }
-  .emotion-dot  { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
-  .emotion-name { font-size: 14px; font-weight: 500; display: block; }
-  .emotion-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; display: block; }
+button {
+    min-width: 75px;
+    border: none;
+    border-radius: 20px;
+    background: white;
+    color: black;
+    padding: 6px 14px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button.on {
+    background: gray;
+}
+
+/* 가운데 미리보기 */
+.center {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.preview {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.phone {
+    width: 235px;
+    height: 385px;
+    background: #d8d8d8;
+    position: relative;
+}
+
+.circle {
+    width: 64px;
+    height: 64px;
+    background: #222;
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle span {
+    width: 48px;
+    height: 48px;
+    background: #7f89a8;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 48px;
+    font-size: 30px;
+}
+
+.subtitle {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 1px 1px 4px black;
+}
+
+/* 자막 효과 */
+@keyframes bounce {
+    0% { margin-top: 0; }
+    50% { margin-top: -8px; }
+    100% { margin-top: 0; }
+}
+
+@keyframes fade {
+    0% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+
+@keyframes shake {
+    0% { margin-left: 0; }
+    25% { margin-left: -6px; }
+    50% { margin-left: 6px; }
+    75% { margin-left: -6px; }
+    100% { margin-left: 0; }
+}
+
+.bounce {
+    animation: bounce 0.7s infinite;
+}
+
+.fade {
+    animation: fade 0.8s infinite alternate;
+}
+
+.shake {
+    animation: shake 0.4s infinite;
+}
+
+/* 하단 재생바 */
+.player {
+    height: 55px;
+    background: #d9d9d9;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0 20px;
+}
+
+.play {
+    width: 30px;
+    height: 30px;
+    background: black;
+    border-radius: 50%;
+    position: relative;
+}
+
+.play::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 8px;
+    border-left: 10px solid white;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+}
+
+.line {
+    flex: 1;
+    height: 10px;
+    background: white;
+    border-radius: 20px;
+}
+
+.time {
+    color: black;
+    font-size: 12px;
+}
+
+/* 감정 버튼 */
+.emotion {
+    height: 74px;
+    border: 4px solid white;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding-left: 28px;
+    cursor: pointer;
+}
+
+.emotion.on {
+    border-color: gray;
+}
+
+.dot {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.emotion-name {
+    font-size: 28px;
+    color: white;
+    margin-right: 10px;
+}
+
+.emotion-desc {
+    font-size: 12px;
+    color: gray;
+}
 </style>
 </head>
+
 <body>
 <div class="app">
 
-  <div class="titlebar">
-    <h1>VIBE - WRITER</h1>
-    <span class="sub">AI 감정 기반 숏폼 자막 자동 생성 서비스</span>
-  </div>
-
-  <div class="main">
-
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title">스타일 설정</span></div>
-      <div class="panel-body">
-
-        <div class="field">
-          <span class="field-label">글자 크기</span>
-          <div class="slider-row">
-            <input type="range" id="fontSize" min="12" max="70" value="28">
-            <span class="slider-val" id="fontSizeVal">28px</span>
-          </div>
-        </div>
-
-        <div class="field">
-          <span class="field-label">위치</span>
-          <div class="pill-group" id="posGroup">
-            <div class="pill" data-val="pos-bottom">하단</div>
-            <div class="pill" data-val="pos-center">중앙</div>
-            <div class="pill active" data-val="pos-top">상단</div>
-          </div>
-        </div>
-
-        <div class="field">
-          <span class="field-label">효과</span>
-          <div class="pill-group" id="fxGroup">
-            <div class="pill active" data-val="fx-bounce">바운스</div>
-            <div class="pill" data-val="fx-fade">페이드</div>
-            <div class="pill" data-val="fx-shake">쉐이크</div>
-            <div class="pill" data-val="fx-none">없음</div>
-          </div>
-        </div>
-
-        <div class="field">
-          <span class="field-label">폰트</span>
-          <div class="pill-group" id="fontGroup">
-            <div class="pill active" data-val="tong">통통체</div>
-            <div class="pill" data-val="gak">각진체</div>
-            <div class="pill" data-val="thin">얇은체</div>
-            <div class="pill" data-val="gothic">고딕</div>
-          </div>
-        </div>
-
-      </div>
+    <div class="header">
+        <h1>VIBE - WRITER</h1>
+        <p>AI 감정 기반 숏폼 자막 자동 생성 서비스</p>
     </div>
 
-    <div class="preview-area">
-      <div class="video-wrapper">
-        <div class="video-bg"></div>
-        <div class="subtitle-overlay pos-top fx-bounce" id="subtitleOverlay">미리보기</div>
-      </div>
+    <div class="main">
+
+        <div class="side">
+            <div class="side-title">
+                <span>스타일 설정</span>
+                
+            </div>
+
+            <div class="side-body">
+
+                <div class="label">글자 크기</div>
+                <input type="range" id="size" min="12" max="70" value="28">
+
+                <div class="label">위치</div>
+                <div class="btns" id="positionBtns">
+                    <button onclick="setPosition('bottom', this)">하단</button>
+                    <button onclick="setPosition('middle', this)">중앙</button>
+                    <button class="on" onclick="setPosition('top', this)">상단</button>
+                </div>
+
+                <div class="label">효과</div>
+                <div class="btns" id="effectBtns">
+                    <button class="on" onclick="setEffect('bounce', this)">바운스</button>
+                    <button onclick="setEffect('fade', this)">페이드</button>
+                    <button onclick="setEffect('shake', this)">쉐이크</button>
+                    <button onclick="setEffect('none', this)">없음</button>
+                </div>
+
+                <div class="label">폰트</div>
+                <div class="btns" id="fontBtns">
+                    <button class="on" onclick="setFont('bold', this)">통통체</button>
+                    <button onclick="setFont('900', this)">각진체</button>
+                    <button onclick="setFont('normal', this)">얇은체</button>
+                    <button onclick="setFont('500', this)">고딕</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="center">
+            <div class="preview">
+                <div class="phone">
+                    <div class="circle">
+                        <span>S</span>
+                    </div>
+                    <div class="subtitle bounce" id="subtitle">미리보기</div>
+                </div>
+            </div>
+
+            <div class="player">
+                <div class="play"></div>
+                <div class="line"></div>
+                <div class="time">0:12 / 0:35</div>
+            </div>
+        </div>
+
+        <div class="side">
+            <div class="side-title">
+                <span>감정 설정</span>
+                
+            </div>
+
+            <div class="side-body">
+
+                <div class="emotion on" onclick="setEmotion('#ffdb3d', 65, 'bold', this)">
+                    <div class="dot" style="background:#ffdb3d"></div>
+                    <div>
+                        <span class="emotion-name">Happy</span>
+                        <span class="emotion-desc">통통체 - 65px</span>
+                    </div>
+                </div>
+
+                <div class="emotion" onclick="setEmotion('#ef3324', 70, '900', this)">
+                    <div class="dot" style="background:#ef3324"></div>
+                    <div>
+                        <span class="emotion-name">Angry</span>
+                        <span class="emotion-desc">각진체 - 70px</span>
+                    </div>
+                </div>
+
+                <div class="emotion" onclick="setEmotion('#5fc0f0', 45, 'normal', this)">
+                    <div class="dot" style="background:#5fc0f0"></div>
+                    <div>
+                        <span class="emotion-name">Sad</span>
+                        <span class="emotion-desc">얇은체 - 45px</span>
+                    </div>
+                </div>
+
+                <div class="emotion" onclick="setEmotion('#aaaaaa', 50, '500', this)">
+                    <div class="dot" style="background:#e8e8e8"></div>
+                    <div>
+                        <span class="emotion-name">Neutral</span>
+                        <span class="emotion-desc">고딕 - 50px</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </div>
-
-    <div class="panel right">
-      <div class="panel-header"><span class="panel-title">감정 설정</span></div>
-      <div class="panel-body">
-
-        <div class="emotion-btn active" data-emotion="happy">
-          <div class="emotion-dot" style="background:#f5c542"></div>
-          <div>
-            <span class="emotion-name">Happy</span>
-            <span class="emotion-desc">노란색 · 65px</span>
-          </div>
-        </div>
-
-        <div class="emotion-btn" data-emotion="angry">
-          <div class="emotion-dot" style="background:#e05050"></div>
-          <div>
-            <span class="emotion-name">Angry</span>
-            <span class="emotion-desc">빨간색 · 70px</span>
-          </div>
-        </div>
-
-        <div class="emotion-btn" data-emotion="sad">
-          <div class="emotion-dot" style="background:#5baef5"></div>
-          <div>
-            <span class="emotion-name">Sad</span>
-            <span class="emotion-desc">파란색 · 45px</span>
-          </div>
-        </div>
-
-        <div class="emotion-btn" data-emotion="neutral">
-          <div class="emotion-dot" style="background:#888"></div>
-          <div>
-            <span class="emotion-name">Neutral</span>
-            <span class="emotion-desc">회색 · 50px</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
 </div>
 
 <script>
-  var overlay    = document.getElementById('subtitleOverlay');
-  var sizeSlider = document.getElementById('fontSize');
-  var sizeVal    = document.getElementById('fontSizeVal');
+let subtitle = document.getElementById("subtitle");
+let size = document.getElementById("size");
 
-  var fontWeightMap = { tong:'700', gak:'900', thin:'300', gothic:'500' };
+size.oninput = function() {
+    subtitle.style.fontSize = size.value + "px";
+}
 
-  overlay.style.fontSize   = '28px';
-  overlay.style.color      = '#ffffff';
-  overlay.style.fontWeight = '700';
+function buttonOn(areaId, button) {
+    let buttons = document.querySelectorAll("#" + areaId + " button");
 
-  sizeSlider.addEventListener('input', function() {
-    overlay.style.fontSize = sizeSlider.value + 'px';
-    sizeVal.textContent    = sizeSlider.value + 'px';
-  });
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove("on");
+    }
 
-  function initPills(groupId, fn) {
-    document.getElementById(groupId).querySelectorAll('.pill').forEach(function(pill) {
-      pill.addEventListener('click', function() {
-        document.getElementById(groupId).querySelectorAll('.pill').forEach(function(p) {
-          p.classList.remove('active');
-        });
-        pill.classList.add('active');
-        fn(pill.dataset.val);
-      });
-    });
-  }
+    button.classList.add("on");
+}
 
-  initPills('posGroup', function(val) {
-    overlay.classList.remove('pos-bottom', 'pos-center', 'pos-top');
-    overlay.classList.add(val);
-  });
+function setPosition(position, button) {
+    buttonOn("positionBtns", button);
 
-  initPills('fxGroup', function(val) {
-    overlay.classList.remove('fx-bounce', 'fx-fade', 'fx-shake', 'fx-none');
-    overlay.classList.add(val);
-  });
+    if (position == "top") {
+        subtitle.style.top = "20px";
+        subtitle.style.bottom = "auto";
+        subtitle.style.transform = "none";
+    }
 
-  initPills('fontGroup', function(val) {
-    overlay.style.fontWeight = fontWeightMap[val];
-  });
+    if (position == "middle") {
+        subtitle.style.top = "50%";
+        subtitle.style.bottom = "auto";
+        subtitle.style.transform = "translateY(-50%)";
+    }
 
-  var emotionPresets = {
-    happy:   { color:'#f5c542', size:'65', font:'tong'   },
-    angry:   { color:'#e05050', size:'70', font:'gak'    },
-    sad:     { color:'#5baef5', size:'45', font:'thin'   },
-    neutral: { color:'#aaaaaa', size:'50', font:'gothic' }
-  };
+    if (position == "bottom") {
+        subtitle.style.top = "auto";
+        subtitle.style.bottom = "20px";
+        subtitle.style.transform = "none";
+    }
+}
 
-  document.querySelectorAll('.emotion-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.emotion-btn').forEach(function(b) { b.classList.remove('active'); });
-      btn.classList.add('active');
+function setEffect(effect, button) {
+    buttonOn("effectBtns", button);
 
-      var p = emotionPresets[btn.dataset.emotion];
-      overlay.style.color      = p.color;
-      overlay.style.fontSize   = p.size + 'px';
-      overlay.style.fontWeight = fontWeightMap[p.font];
+    subtitle.classList.remove("bounce");
+    subtitle.classList.remove("fade");
+    subtitle.classList.remove("shake");
 
-      sizeSlider.value    = p.size;
-      sizeVal.textContent = p.size + 'px';
+    if (effect != "none") {
+        subtitle.classList.add(effect);
+    }
+}
 
-      document.querySelectorAll('#fontGroup .pill').forEach(function(pill) {
-        pill.classList.toggle('active', pill.dataset.val === p.font);
-      });
-    });
-  });
+function setFont(weight, button) {
+    buttonOn("fontBtns", button);
+    subtitle.style.fontWeight = weight;
+}
+
+function setEmotion(color, fontSize, weight, box) {
+    let boxes = document.querySelectorAll(".emotion");
+
+    for (let i = 0; i < boxes.length; i++) {
+        boxes[i].classList.remove("on");
+    }
+
+    box.classList.add("on");
+
+    subtitle.style.color = color;
+    subtitle.style.fontSize = fontSize + "px";
+    subtitle.style.fontWeight = weight;
+    size.value = fontSize;
+}
 </script>
-</body>
-</html>"""
 
-components.html(HTML_APP, height=700, scrolling=False)
+</body>
+</html>
+"""
+
+components.html(html_code, height=820, scrolling=False)
