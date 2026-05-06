@@ -233,3 +233,4 @@ def render_all_frames(
  
     cap.release()
     return output_dir
+
