@@ -1,131 +1,142 @@
-from funasr import AutoModel
-from funasr.utils.load_utils import load_audio_text_image_video, extract_fbank
-import torch
+def map_emotion(emotion: str) -> str:
+    emotion = emotion.lower()
+
+    if emotion in ["happy", "surprised"]:
+        return "Happy"
+    elif emotion == "sad":
+        return "Sad"
+    elif emotion in ["angry", "disgust", "disgusted", "fearful"]:
+        return "Angry"
+    elif emotion in ["neutral", "other", "unknown"]:
+        return "Neutral"
+    else:
+        return "Neutral"
 
 
-def fix_imbalance(result):
-    probs = result.get("emotion_probs", {})
-    if not probs:
-        return result
+def fix_imbalance(scores: dict) -> str:
+    if not scores:
+        return "Neutral"
 
-    top_emotion = max(probs, key=probs.get)
-    top_score = probs[top_emotion]
+    if scores.get("neutral", 0.0) >= 0.70:
+        return "Neutral"
 
-    if top_emotion == "Neutral" and top_score < 0.70:
-        sorted_items = sorted(probs.items(), key=lambda x: x[1], reverse=True)
-        if len(sorted_items) > 1:
-            result["emotion"] = sorted_items[1][0]
-
-    return result
+    top_emotion = max(scores, key=scores.get)
+    return map_emotion(top_emotion)
 
 
-def run_sensevoice_with_probs(audio_path):
-    model, kwargs = AutoModel.build_model(
-        model="FunAudioLLM/SenseVoiceSmall",
-        trust_remote_code=True,
-        device="cpu",
-        hub="hf",
-        disable_update=True,
-    )
+def apply_final_emotion(results: list) -> list:
+    emotion_keys = [
+        "angry",
+        "disgust",
+        "fearful",
+        "happy",
+        "neutral",
+        "other",
+        "sad",
+        "surprised",
+        "unknown",
+    ]
 
-    frontend = kwargs["frontend"]
-    tokenizer = kwargs["tokenizer"]
+    processed_results = []
 
-    audio_sample_list = load_audio_text_image_video(
-        audio_path,
-        fs=frontend.fs,
-        audio_fs=kwargs.get("fs", 16000),
-        data_type="sound",
-        tokenizer=tokenizer,
-    )
+    for item in results:
+        scores = {key: item.get(key, 0.0) for key in emotion_keys}
+        final_emotion = fix_imbalance(scores)
 
-    speech, speech_lengths = extract_fbank(
-        audio_sample_list,
-        data_type="sound",
-        frontend=frontend,
-    )
+        processed_item = item.copy()
+        processed_item["final_emotion"] = final_emotion
 
-    speech = speech.to(device=kwargs["device"])
-    speech_lengths = speech_lengths.to(device=kwargs["device"])
+        processed_results.append(processed_item)
 
-    language = "auto"
-    use_itn = True
-    textnorm = "withitn" if use_itn else "woitn"
-
-    language_query = model.embed(
-        torch.LongTensor([[model.lid_dict[language] if language in model.lid_dict else 0]]).to(speech.device)
-    ).repeat(speech.size(0), 1, 1)
-
-    textnorm_query = model.embed(
-        torch.LongTensor([[model.textnorm_dict[textnorm]]]).to(speech.device)
-    ).repeat(speech.size(0), 1, 1)
-
-    speech = torch.cat((textnorm_query, speech), dim=1)
-    speech_lengths += 1
-
-    event_emo_query = model.embed(
-        torch.LongTensor([[1, 2]]).to(speech.device)
-    ).repeat(speech.size(0), 1, 1)
-
-    input_query = torch.cat((language_query, event_emo_query), dim=1)
-    speech = torch.cat((input_query, speech), dim=1)
-    speech_lengths += 3
-
-    encoder_out, encoder_out_lens = model.encoder(speech, speech_lengths)
-    if isinstance(encoder_out, tuple):
-        encoder_out = encoder_out[0]
-
-    rich_logits = model.ctc.ctc_lo(encoder_out[:, :4, :])
-
-    emo_ids = {
-        "Happy": model.emo_dict["happy"],
-        "Sad": model.emo_dict["sad"],
-        "Angry": model.emo_dict["angry"],
-        "Neutral": model.emo_dict["neutral"],
-    }
-
-    emo_position = 2
-    emo_token_ids = [emo_ids["Happy"], emo_ids["Sad"], emo_ids["Angry"], emo_ids["Neutral"]]
-    emo_logits = rich_logits[0, emo_position, emo_token_ids]
-    emo_probs = torch.softmax(emo_logits, dim=-1)
-
-    emotion_probs = {
-        "Happy": float(emo_probs[0]),
-        "Sad": float(emo_probs[1]),
-        "Angry": float(emo_probs[2]),
-        "Neutral": float(emo_probs[3]),
-    }
-
-    ctc_logits = model.ctc.log_softmax(encoder_out)
-    x = ctc_logits[0, : encoder_out_lens[0].item(), :]
-    yseq = x.argmax(dim=-1)
-    yseq = torch.unique_consecutive(yseq, dim=-1)
-    mask = yseq != model.blank_id
-    token_int = yseq[mask].tolist()
-    text = tokenizer.decode(token_int)
-
-    top_emotion = max(emotion_probs, key=emotion_probs.get)
-
-    result = {
-        "text": text,
-        "emotion": top_emotion,
-        "emotion_probs": emotion_probs,
-    }
-
-    return result
+    return processed_results
 
 
 if __name__ == "__main__":
-    result = run_sensevoice_with_probs("sample.wav")
+    sungjae_results = [
+        {
+            "start": 0.0,
+            "end": 3.0,
+            "text": "안녕하세요",
+            "angry": 0.1,
+            "disgust": 0.2,
+            "fearful": 0.3,
+            "happy": 0.4,
+            "neutral": 0.5,
+            "other": 0.6,
+            "sad": 0.7,
+            "surprised": 0.8,
+            "unknown": 0.9,
+        },
+        {
+            "start": 3.0,
+            "end": 6.0,
+            "text": "반갑습니다",
+            "angry": 0.1,
+            "disgust": 0.2,
+            "fearful": 0.3,
+            "happy": 0.4,
+            "neutral": 0.8,
+            "other": 0.1,
+            "sad": 0.2,
+            "surprised": 0.3,
+            "unknown": 0.1,
+        },
+        {
+            "start": 6.0,
+            "end": 9.0,
+            "text": "화가 납니다",
+            "angry": 0.75,
+            "disgust": 0.1,
+            "fearful": 0.05,
+            "happy": 0.02,
+            "neutral": 0.1,
+            "other": 0.01,
+            "sad": 0.03,
+            "surprised": 0.04,
+            "unknown": 0.02,
+        },
+        {
+            "start": 9.0,
+            "end": 12.0,
+            "text": "기분이 좋습니다",
+            "angry": 0.02,
+            "disgust": 0.01,
+            "fearful": 0.03,
+            "happy": 0.65,
+            "neutral": 0.2,
+            "other": 0.05,
+            "sad": 0.04,
+            "surprised": 0.7,
+            "unknown": 0.01,
+        },
+    ]
 
-    print("=== raw result ===")
-    print(result)
+    result = apply_final_emotion(sungjae_results)
 
-    print("=== emotion probability scores ===")
-    for emotion, score in result["emotion_probs"].items():
-        print(f"{emotion}: {score:.6f}")
+    print("=== integration test result ===")
+    for item in result:
+        print(
+            {
+                "start": item["start"],
+                "end": item["end"],
+                "text": item["text"],
+                "final_emotion": item["final_emotion"],
+            }
+        )
 
-    result = fix_imbalance(result)
+    print("\n=== mapping table ===")
+    mapping_table = {
+        "happy": "Happy",
+        "surprised": "Happy",
+        "sad": "Sad",
+        "angry": "Angry",
+        "disgust": "Angry",
+        "disgusted": "Angry",
+        "fearful": "Angry",
+        "neutral": "Neutral",
+        "other": "Neutral",
+        "unknown": "Neutral",
+    }
 
-    print("=== final emotion ===")
-    print(result["emotion"])
+    for emotion, mapped_emotion in mapping_table.items():
+        print(f"{emotion} -> {mapped_emotion}")
