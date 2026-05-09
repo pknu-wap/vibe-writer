@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import heroImage from "../../public/vibe-hero.png";
 
 export default function Home() {
   return (
@@ -12,10 +14,11 @@ export default function Home() {
         </p>
       </div>
 
-      <img
-        src="/vibe-hero.png"
+      <Image
+        src={heroImage}
         alt=""
-        className="absolute right-[5%] top-[20%] w-[45vw] max-w-[700px] object-contain"
+        className="absolute right-[5%] top-[20%] w-[45vw] max-w-[700px] h-auto object-contain"
+        priority
       />
 
       <p className="absolute left-[7%] top-[40%] text-2xl text-white leading-relaxed">
