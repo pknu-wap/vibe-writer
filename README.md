@@ -82,6 +82,7 @@
 |:---:|:---:|
 | <div align="center">**백엔드**</div> | <div align="center"><img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"/><br><img src="https://img.shields.io/badge/HuggingFace%20CPU%20Space-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black"/></div> |
 | <div align="center">**AI**</div> | <div align="center"><img src="https://img.shields.io/badge/Whisper-412991?style=for-the-badge&logo=openai&logoColor=white"/><br><img src="https://img.shields.io/badge/emotion2vec-000000?style=for-the-badge&logo=huggingface&logoColor=gold"/></div> |
+| <div align="center">**협업**</div> | <div align="center"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white"/><br><img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white"/><br><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"/></div> |
 | <div align="center">**디자인**</div> | <div align="center"><img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/></div> |
 
 ---
