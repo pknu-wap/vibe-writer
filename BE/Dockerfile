@@ -1,0 +1,44 @@
+# backend-api/main.py
+import os
+from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi.responses import FileResponse
+
+app = FastAPI()
+router = APIRouter()
+
+# 파일이 저장되는 경로 설정 (실제 프로젝트 경로에 맞게 수정)
+VIDEO_DIR = "./output/videos"
+SRT_DIR = "./output/subtitles"
+
+@router.get("/download")
+async def download_video():
+    """최종 영상 다운로드 엔드포인트"""
+    file_name = "final_video.mp4"  # 실제 생성되는 파일명 로직 적용
+    file_path = os.path.join(VIDEO_DIR, file_name)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="영상을 찾을 수 없습니다.")
+        
+    return FileResponse(
+        path=file_path, 
+        filename=file_name, 
+        media_type="video/mp4"
+    )
+
+@router.get("/download-srt")
+async def download_srt():
+    """자막 파일 다운로드 엔드포인트"""
+    file_name = "subtitles.srt"  # 실제 생성되는 파일명 로직 적용
+    file_path = os.path.join(SRT_DIR, file_name)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="자막 파일을 찾을 수 없습니다.")
+        
+    return FileResponse(
+        path=file_path, 
+        filename=file_name, 
+        media_type="application/x-subrip"  # srt 표준 미디어 타입
+    )
+
+
+app.include_router(router)
