@@ -17,9 +17,6 @@ def fix_imbalance(scores: dict) -> str:
     if not scores:
         return "Neutral"
 
-    if scores.get("neutral", 0.0) >= 0.70:
-        return "Neutral"
-
     top_emotion = max(scores, key=scores.get)
     return map_emotion(top_emotion)
 
