@@ -78,9 +78,10 @@
 
 ## 🛠️ 기술 스택
 
-| <div align="center">프론트엔드</div> | <div align="center"><img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/><br><img src="https://img.shields.io/badge/HuggingFace%20CPU%20Space-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black"/></div> |
+| <div align="center">프론트엔드</div> | <div align="center"><img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white"/><br><img src="https://img.shields.io/badge/HuggingFace%20CPU%20Space-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black"/></div> |
 |:---:|:---:|
-| <div align="center">**AI**</div> | <div align="center"><img src="https://img.shields.io/badge/SenseVoice--Small-000000?style=for-the-badge&logo=huggingface&logoColor=gold"/><br><img src="https://img.shields.io/badge/HuggingFace%20Inference%20API-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black"/></div> |
+| <div align="center">**백엔드**</div> | <div align="center"><img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"/><br><img src="https://img.shields.io/badge/HuggingFace%20CPU%20Space-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black"/></div> |
+| <div align="center">**AI**</div> | <div align="center"><img src="https://img.shields.io/badge/Whisper-412991?style=for-the-badge&logo=openai&logoColor=white"/><br><img src="https://img.shields.io/badge/emotion2vec-000000?style=for-the-badge&logo=huggingface&logoColor=gold"/></div> |
 | <div align="center">**협업**</div> | <div align="center"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white"/><br><img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white"/><br><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"/></div> |
 | <div align="center">**디자인**</div> | <div align="center"><img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/></div> |
 
@@ -93,4 +94,3 @@
 - ✍️ 감정에 맞는 자막 생성
 - 🎬 영상 편집
 - 💾 생성된 영상 다운로드
-

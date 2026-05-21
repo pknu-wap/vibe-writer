@@ -234,3 +234,52 @@ def render_all_frames(
     cap.release()
     return output_dir
 
+
+from fastapi import APIRouter, UploadFile, File, HTTPException
+import shutil, os, tempfile
+
+router = APIRouter()
+
+@router.post("/upload")
+async def upload_video(file: UploadFile = File(...)):
+    temp_dir = tempfile.mkdtemp()
+    temp_path = os.path.join(temp_dir, file.filename)
+    
+    with open(temp_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    return {"filename": file.filename, "path": temp_path}
+
+
+@router.post("/analyze")
+async def analyze_video(file: UploadFile = File(...)):
+  
+    temp_dir = tempfile.mkdtemp()
+    video_path = os.path.join(temp_dir, file.filename)
+    
+    with open(video_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    try:
+        from backend.video_utils import extract_audio, get_still_cut, render_subtitle, render_all_frames
+        from backend.ai import analyze_emotion 
+        
+  
+        audio_path = extract_audio(video_path)
+        emotions = analyze_emotion(audio_path) 
+        
+  
+        output_path = os.path.join(temp_dir, "output_" + file.filename)
+        render_all_frames(video_path, emotions, output_path)
+        
+        return {
+            "status": "success",
+            "output_path": output_path,
+            "emotions": emotions
+        }
+    
+    except ImportError as e:
+        raise HTTPException(status_code=500, detail=f"Import 실패 — 구동하한테 카톡: {str(e)}")
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
