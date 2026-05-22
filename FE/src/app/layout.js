@@ -2,7 +2,7 @@ import "./globals.css";
 
 export default function RootLayout({ children }) {
   return (
-    <html>
+    <html lang="ko">
       <body>{children}</body>
     </html>
   );
