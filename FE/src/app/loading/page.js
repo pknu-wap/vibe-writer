@@ -14,6 +14,7 @@ function Spinner() {
         height="140"
         className="animate-spin"
         style={{ animationDuration: "1.8s" }}
+        aria-hidden="true"
       >
         {BLADE_ANGLES.map((angle) => (
           <rect
