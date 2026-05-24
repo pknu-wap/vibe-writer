@@ -47,27 +47,29 @@ export default function Loading() {
   }, []);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#180028] via-[#08000f] to-black text-white px-8 py-6">
+    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#180028] via-[#08000f] to-black text-white px-4 py-6">
       <link
-       href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
-       rel="stylesheet"
-      />
+        href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
+        rel="stylesheet"
+       />
 
       <header className="flex items-center gap-6">
-        <Link href="<Link href="> 
-  
+        <Link href="/">
+        
           <h1
-            className="text-[38px] font-black tracking-[0.16em] hover:opacity-80"
+            className="text-[41px] font-black tracking-[0.08em] hover:opacity-80  -translate-y-2"
             style={{ fontFamily: "'Nippo', sans-serif" }}
           >
             VIBE-WRITER
           </h1>
         </Link>
 
-        <p className="text-[15px] text-white/80 tracking-wide">
+        <p className="text-[18px] text-white/80 tracking-wide">
           AI 감정 기반 숏폼 자막 자동 생성 서비스
         </p>
       </header>
+
+      <div className='-mx-8 mt-1 border-b-2 border-white/80' />
 
       <main className="flex justify-center mt-24">
         <div className="w-full max-w-[530px] h-[500px] rounded-[60px] border-[6px] border-white/80 bg-gradient-to-b from-[#190022] via-[#1e1b27] to-[#3B3B3B] flex flex-col items-center justify-center">
