@@ -48,15 +48,14 @@ export default function Loading() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#180028] via-[#08000f] to-black text-white px-8 py-6">
-      <style>
-        {`
-          @import url("https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap");
-        `}
-      </style>
+      <link
+       href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
+       rel="stylesheet"
+      />
 
       <header className="flex items-center gap-6">
-        <Link href="/intro"> 
-        {/*intro 연결 확인 필요*/}
+        <Link href="<Link href="> 
+  
           <h1
             className="text-[38px] font-black tracking-[0.16em] hover:opacity-80"
             style={{ fontFamily: "'Nippo', sans-serif" }}
@@ -71,7 +70,7 @@ export default function Loading() {
       </header>
 
       <main className="flex justify-center mt-24">
-        <div className="w-[530px] h-[500px] rounded-[60px] border-[6px] border-white/80 bg-gradient-to-b from-[#190022] via-[#1e1b27] to-[#3B3B3B] flex flex-col items-center justify-center">
+        <div className="w-full max-w-[530px] h-[500px] rounded-[60px] border-[6px] border-white/80 bg-gradient-to-b from-[#190022] via-[#1e1b27] to-[#3B3B3B] flex flex-col items-center justify-center">
           <Spinner />
           {/*박스 크기 및 색상 수정 필요*/}
 
