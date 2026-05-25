@@ -1,10 +1,9 @@
-def decide_emotion(scores: dict) -> str:
+def map_emotion(scores: dict) -> str:
     if not scores:
-        return "neutral"
+        return "Neutral"
 
     emotion_keys = [
         "angry",
-        "disgust",
         "disgusted",
         "fearful",
         "happy",
@@ -12,7 +11,6 @@ def decide_emotion(scores: dict) -> str:
         "other",
         "sad",
         "surprised",
-        "unknown",
         "<unk>",
     ]
 
@@ -23,33 +21,25 @@ def decide_emotion(scores: dict) -> str:
     }
 
     if not valid_scores:
-        return "neutral"
-
-    return max(valid_scores, key=valid_scores.get)
-
-
-def map_emotion(emotion: str) -> str:
-    if not emotion:
         return "Neutral"
 
-    emotion = emotion.lower()
+    top_emotion = max(valid_scores, key=valid_scores.get)
 
-    if emotion in ["happy", "surprised"]:
+    if top_emotion == "happy":
         return "Happy"
 
-    if emotion == "sad":
+    if top_emotion == "sad":
         return "Sad"
 
-    if emotion in ["angry", "disgust", "disgusted", "fearful"]:
+    if top_emotion == "angry":
         return "Angry"
 
     return "Neutral"
 
 
 def postprocess_emotion(scores: dict) -> str:
-    emotion = decide_emotion(scores)
-    return map_emotion(emotion)
+    return map_emotion(scores)
 
 
 def fix_imbalance(scores: dict) -> str:
-    return postprocess_emotion(scores)
+    return map_emotion(scores)
