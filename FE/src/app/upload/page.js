@@ -12,20 +12,20 @@ export default function App() {
 
     if (!file) return;
 
-    //router.push("/loading");
+    router.push("/loading");
 
-    //const formData = new FormData();
+    const formData = new FormData();
 
-    //formData.append("video", file);
+    formData.append("video", file);
 
-    //const response = await fetch(
-      //"http://localhost:8080/upload",
-      //{
-        //method: "POST",
-        //body:formData,
+    const response = await fetch(
+      "http://localhost:8080/upload",
+      {
+        method: "POST",
+        body:formData,
 
-      //}
-    //);
+      }
+    );
     router.push("/loading");
 
   };
