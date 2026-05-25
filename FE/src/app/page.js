@@ -1,5 +1,6 @@
 import "./intro.css";
 import TopNav from "./components/top-nav";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -26,10 +27,12 @@ export default function Home() {
         VIBE - WRITER
       </h1>
 
-      
-      <button className="start-button">
-        지금 시작하기
-      </button>
+      <Link href="/upload">
+        <button className="start-button">
+          지금 시작하기
+        </button>
+      </Link>
+
     </div>
   );
 }

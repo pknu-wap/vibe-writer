@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+@font-face {
+  font-family: "Nippo";
+  src: url("/fonts/Nippo-Bold.otf");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100vh;
+
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+}
+
+.upload-container {
+  min-height: 100vh;
+
+  background:
+    linear-gradient(
+      112.74deg,
+      #190022 5.73%,
+      #000000 89.42%
+    );
+
+  color: white;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 30px;
+}
+
+.upload-main-title {
+  font-family: "Nippo";
+  font-size: 82px;
+  font-weight: 700;
+
+  letter-spacing: 0.05em;
+
+  color: white;
+
+  margin-bottom: 35px;
+
+  text-shadow:
+    0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+
+
+.upload-card {
+  width: 800px;
+  height: 650px;
+
+  border: 8px solid rgba(255,255,255,0.95);
+  border-radius: 70px 70px 0 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(35, 0, 45, 0.92) 0%,
+      rgba(55, 55, 55, 0.55) 100%
+    );
+
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  transform: translateY(20px);
+
+  padding-top: 55px;
+}
+
+
+
+.upload-circle {
+  width: 240px;
+  height: 240px;
+
+  border-radius: 50%;
+  border: 8px solid white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin-bottom: 55px;
+}
+
+.upload-circle svg {
+  width: 90px;
+  height: 90px;
+}
+
+
+
+.upload-title {
+  font-size: 42px;
+  font-weight: 700;
+
+  color: white;
+
+  margin-bottom: 12px;
+}
+
+.upload-desc {
+  font-size: 24px;
+
+  color: rgba(255,255,255,0.9);
+
+  margin-bottom: 55px;
+}
+
+
+.upload-button {
+  width: 440px;
+  height: 95px;
+
+  border-radius: 28px;
+  border: 5px solid white;
+
+  background: rgba(85, 65, 95, 0.9);
+
+  color: white;
+
+  font-size: 38px;
+  font-weight: 700;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.upload-button:hover {
+  transform: scale(1.03);
+
+  background: rgba(100, 75, 110, 0.95);
+}
