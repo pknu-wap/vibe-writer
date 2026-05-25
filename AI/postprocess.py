@@ -14,7 +14,7 @@ def map_emotion(emotion: str) -> str:
         return "Happy"
     if emotion == "sad":
         return "Sad"
-    if emotion in ["angry", "disgusted", "fearful"]:
+    if emotion in ["angry", "disgust", "disgusted", "fearful"]:
         return "Angry"
 
     return "Neutral"
@@ -23,3 +23,7 @@ def map_emotion(emotion: str) -> str:
 def postprocess_emotion(scores: dict) -> str:
     emotion = decide_emotion(scores)
     return map_emotion(emotion)
+
+
+def fix_imbalance(scores: dict) -> str:
+    return postprocess_emotion(scores)
