@@ -12,8 +12,6 @@ export default function App() {
 
     if (!file) return;
 
-    router.push("/loading");
-
     const formData = new FormData();
 
     formData.append("video", file);
