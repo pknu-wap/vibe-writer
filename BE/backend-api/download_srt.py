@@ -18,6 +18,6 @@ async def download_srt(video_id: str):
 
     return FileResponse(
         path=file_path,
-        media_type="text/plain",
+        media_type="application/x-subrip",
         filename=f"vibe_writer_{video_id}.srt",
     )
