@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 app = FastAPI()
 router = APIRouter()
 
-# 파일이 저장되는 경로 설정 (실제 프로젝트 경로에 맞게 수정)
+# 파일이 저장되는 경로 설정 ( 프로젝트 경로에 맞게 수정)
 VIDEO_DIR = "./output/videos"
 SRT_DIR = "./output/subtitles"
 
