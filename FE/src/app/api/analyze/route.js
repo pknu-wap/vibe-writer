@@ -43,10 +43,15 @@ const MOCK_SEGMENTS = [
 ];
 
 export async function POST(request) {
-  const { video_id } = await request.json();
-
-  if (!video_id) {
-    return Response.json({ error: "video_id is required" }, { status: 400 });
+  let video_id;
+  try {
+    const body = await request.json();
+    video_id = body?.video_id;
+  } catch {
+    return Response.json(
+      { error: "Invalid JSON or empty body" },
+      { status: 400 },
+    );
   }
 
   await new Promise((r) => setTimeout(r, 1000));
