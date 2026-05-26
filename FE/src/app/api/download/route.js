@@ -2,7 +2,7 @@ import { createReadStream, statSync } from "fs";
 import { join } from "path";
 import { Readable } from "stream";
 
-// 목 서버: video_id와 무관하게 sample.mp4를 스트리밍
+// 목 서버: video_id와 무관하게 input.mp4를 스트리밍
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const videoId = searchParams.get("video_id");
