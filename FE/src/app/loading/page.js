@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { uploadStore } from "../lib/upload-store";
 
 const BLADE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
@@ -34,17 +36,33 @@ function Spinner() {
 }
 
 export default function Loading() {
-  const [percent, setPercent] = useState(1);
+  const [percent, setPercent] = useState(0);
+  const [status, setStatus] = useState("동영상 업로드 중...");
+  const router = useRouter();
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setPercent((prev) => {
-        if (prev >= 100) return 100;
-        return prev + 1;
-      });
-    }, 45);
+    if (!uploadStore.promise) {
+      router.push("/edit");
+      return;
+    }
 
-    return () => clearInterval(timer);
+    uploadStore.promise.then(async (uploadResult) => {
+      uploadStore.videoInfo = uploadResult;
+      setPercent(50);
+      setStatus("동영상 분석 중...");
+      const { video_id } = uploadResult;
+
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_id }),
+      });
+      const { segments } = await res.json();
+      uploadStore.segments = segments;
+
+      setPercent(100);
+      router.push("/edit");
+    });
   }, []);
 
   return (
@@ -52,11 +70,10 @@ export default function Loading() {
       <link
         href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
         rel="stylesheet"
-       />
+      />
 
       <header className="flex items-center gap-6">
         <Link href="/">
-        
           <h1
             className="text-[41px] font-black tracking-[0.08em] hover:opacity-80  -translate-y-2"
             style={{ fontFamily: "'Nippo', sans-serif" }}
@@ -70,7 +87,7 @@ export default function Loading() {
         </p>
       </header>
 
-      <div className='-mx-8 mt-1 border-b-2 border-white/80' />
+      <div className="-mx-8 mt-1 border-b-2 border-white/80" />
 
       <main className="flex justify-center mt-24">
         <div className="w-full max-w-[530px] h-[500px] rounded-[60px] border-[6px] border-white/80 bg-gradient-to-b from-[#190022] via-[#1e1b27] to-[#3B3B3B] flex flex-col items-center justify-center">
@@ -89,7 +106,7 @@ export default function Loading() {
           </div>
 
           <p className="text-[19px] mt-7 tracking-wide text-white/90">
-            stt 변환 중 ... {percent}%
+            {status} {percent}%
           </p>
         </div>
       </main>

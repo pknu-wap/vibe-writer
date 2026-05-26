@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const BLADE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
@@ -34,11 +35,16 @@ function Spinner() {
 
 export default function Loading() {
   const [percent, setPercent] = useState(1);
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setInterval(() => {
       setPercent((prev) => {
-        if (prev >= 100) return 100;
+        if (prev >= 100) {
+          clearInterval(timer);
+          router.push("/download");
+          return 100;
+        }
         return prev + 1;
       });
     }, 45);
@@ -51,11 +57,10 @@ export default function Loading() {
       <link
         href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
         rel="stylesheet"
-       />
+      />
 
       <header className="flex items-center gap-6">
         <Link href="/">
-        
           <h1
             className="text-[41px] font-black tracking-[0.08em] hover:opacity-80  -translate-y-2"
             style={{ fontFamily: "'Nippo', sans-serif" }}
@@ -69,7 +74,7 @@ export default function Loading() {
         </p>
       </header>
 
-      <div className='-mx-8 mt-1 border-b-2 border-white/80' />
+      <div className="-mx-8 mt-1 border-b-2 border-white/80" />
 
       <main className="flex justify-center mt-24">
         <div className="w-full max-w-[530px] h-[500px] rounded-[60px] border-[6px] border-white/80 bg-gradient-to-b from-[#190022] via-[#1e1b27] to-[#3B3B3B] flex flex-col items-center justify-center">
