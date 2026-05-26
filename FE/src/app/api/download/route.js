@@ -17,7 +17,7 @@ export async function GET(request) {
 
   if (range) {
     const [startStr, endStr] = range.replace(/bytes=/, "").split("-");
-    const start = parseInt(startStr, 10);
+    const start = parseInt(startStr, 10) || 0;
     const end = endStr ? parseInt(endStr, 10) : size - 1;
 
     return new Response(
