@@ -60,7 +60,6 @@ def analyze_stt(audio_path):
         video_sub[i]['surprised'] = rec_result[0]['scores'][7]
         video_sub[i]['unknown'] = rec_result[0]['scores'][8]
 
-    #찐찐막 
     for sub in video_sub:
         final_result.append({'start':sub['start'],
                     'end':sub['end'],
