@@ -9,8 +9,8 @@ VIDEO_DIR = os.path.join(os.path.dirname(__file__), "output", "videos")
 
 @router.get("/download")
 async def download_video(video_id: str):
-    if not video_id:
-        raise HTTPException(status_code=422, detail="video_id is required")
+    if not video_id or ".." in video_id or "/" in video_id or "\\" in video_id:
+        raise HTTPException(status_code=400, detail="Invalid video_id")
 
     failed_marker = os.path.join(VIDEO_DIR, f"{video_id}.failed")
     if os.path.exists(failed_marker):
