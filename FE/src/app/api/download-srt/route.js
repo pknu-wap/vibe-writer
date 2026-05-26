@@ -26,7 +26,7 @@ const toSrtTime = (sec) => {
   const s = Math.floor(sec % 60)
     .toString()
     .padStart(2, "0");
-  const ms = Math.round((sec % 1) * 1000)
+  const ms = Math.floor((sec % 1) * 1000)
     .toString()
     .padStart(3, "0");
   return `${h}:${m}:${s},${ms}`;
