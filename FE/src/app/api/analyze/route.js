@@ -54,6 +54,10 @@ export async function POST(request) {
     );
   }
 
+  if (!video_id) {
+    return Response.json({ error: "video_id is required" }, { status: 400 });
+  }
+
   await new Promise((r) => setTimeout(r, 1000));
 
   return Response.json({ video_id, segments: MOCK_SEGMENTS });
