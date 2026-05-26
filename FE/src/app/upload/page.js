@@ -3,7 +3,7 @@ import "./upload.css";
 import TopNav from "../components/top-nav";
 import { useRouter } from "next/navigation";
 
-export default function uploadPage() {
+export default function UploadPage() {
 
   const router = useRouter();
 
