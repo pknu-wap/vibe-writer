@@ -5,23 +5,9 @@
   src: url("/fonts/Nippo-Bold.otf");
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html,
-body {
-  width: 100%;
-  min-height: 100vh;
-
-  font-family: "Inter", sans-serif;
-  overflow: hidden;
-}
-
 .upload-container {
   min-height: 100vh;
+  overflow: hidden;
 
   background:
     linear-gradient(

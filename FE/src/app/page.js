@@ -27,10 +27,8 @@ export default function Home() {
         VIBE - WRITER
       </h1>
 
-      <Link href="/upload">
-        <button className="start-button">
-          지금 시작하기
-        </button>
+      <Link href="/upload" className="start-button">
+        지금 시작하기
       </Link>
 
     </div>

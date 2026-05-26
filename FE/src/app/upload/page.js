@@ -3,7 +3,7 @@ import "./upload.css";
 import TopNav from "../components/top-nav";
 import { useRouter } from "next/navigation";
 
-export default function App() {
+export default function uploadPage() {
 
   const router = useRouter();
 
@@ -11,6 +11,7 @@ export default function App() {
     const file = e.target.files[0];
 
     if (!file) return;
+
 
     const formData = new FormData();
 
