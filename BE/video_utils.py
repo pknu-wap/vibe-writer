@@ -1,5 +1,8 @@
 from moviepy import VideoFileClip
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def extract_audio(video_path):
     video = VideoFileClip(video_path)
@@ -20,13 +23,6 @@ def get_still_cut(video_path, timestamp):
     
     return frame
 
-
-if __name__ == "__main__":
-    result = extract_audio("C:/Users/jine7/Desktop/구동하.mp4")
-    print(result)
-
-    frame = get_still_cut("C:/Users/jine7/Desktop/구동하.mp4", 3.0)
-    print(frame.shape)
 
 import cv2
 from PIL import Image, ImageDraw, ImageFont
@@ -80,7 +76,6 @@ def _hex_to_rgba(hex_color: str, alpha: int = 255) -> tuple[int, int, int, int]:
  
  
 def _load_font(font_path: str, font_size: int) -> ImageFont.FreeTypeFont:
-    """폰트 로드. 실패 시 기본 폰트 반환."""
     try:
         return ImageFont.truetype(font_path, font_size)
     except Exception:
@@ -93,34 +88,6 @@ def render_subtitle(
     font_variant: str | None = None,
     style_preset: dict | None = None,
 ) -> np.ndarray:
-    """
-    영상 프레임에 감정 기반 자막을 렌더링합니다.
- 
-    Parameters
-    ----------
-    frame         : H×W×3 BGR numpy array (OpenCV 포맷)
-    text          : 표시할 자막 문자열
-    emotion       : 'Happy' | 'Angry' | 'Sad' | 'Neutral'
-    font_variant  : 감정별 폰트 키 (없으면 default_font 사용)
-                    Happy   → 'mallang' | 'griun'
-                    Sad     → 'kcc' | 'daechung'
-                    Angry   → 'ongleaf' | 'mulmaru'
-                    Neutral → 'pretendard'
-    style_preset  : {'color': '#RRGGBB', 'font_size': int, 'font_path': str} 형태로
-                    직접 넘기면 emotion 프리셋 전체를 무시하고 사용
- 
-    Returns
-    -------
-    frame_out : 자막이 합성된 H×W×3 BGR numpy array
- 
-    Examples
-    --------
-    >>> render_subtitle(frame, "신난다!", emotion="Happy")
-    >>> render_subtitle(frame, "신난다!", emotion="Happy", font_variant="griun")
-    >>> render_subtitle(frame, "슬퍼", emotion="Sad", font_variant="daechung")
-    >>> render_subtitle(frame, "분노", emotion="Angry", font_variant="mulmaru")
-    """
- 
     if style_preset:
         color     = style_preset.get("color", "#FFFFFF")
         font_size = style_preset.get("font_size", 50)
@@ -163,31 +130,6 @@ def render_all_frames(
     output_dir: str = "frames",
     font_variant: str | None = None,
 ) -> str:
-    """
-    영상 전체 프레임에 자막을 렌더링하여 frames/ 폴더에 저장합니다.
- 
-    Parameters
-    ----------
-    video_path   : 원본 영상 파일 경로
-    segments     : AI 반환값 리스트. 각 항목은 아래 형태:
-                   {'text': str, 'start': float, 'end': float, 'emotion': str}
-                   start/end 단위는 초(seconds)
-    output_dir   : 프레임 저장 폴더 (기본값: 'frames')
-    font_variant : render_subtitle에 넘길 폰트 키 (없으면 emotion별 default 사용)
- 
-    Returns
-    -------
-    output_dir : 저장된 프레임 폴더 경로 (merge_video에 바로 넘길 수 있음)
- 
-    Examples
-    --------
-    >>> segments = [
-    ...     {'text': '안녕하세요', 'start': 0.0,  'end': 3.5,  'emotion': 'Happy'},
-    ...     {'text': '슬프다',    'start': 3.5,  'end': 7.0,  'emotion': 'Sad'},
-    ... ]
-    >>> frame_dir = render_all_frames('input.mp4', segments)
-    >>> merge_video(frame_dir, ...)
-    """
     import os
  
     os.makedirs(output_dir, exist_ok=True)
@@ -235,51 +177,138 @@ def render_all_frames(
     return output_dir
 
 
+# ──────────────────────────────────────────
+# API Router
+# ──────────────────────────────────────────
+
 from fastapi import APIRouter, UploadFile, File, HTTPException
-import shutil, os, tempfile
+from fastapi.responses import JSONResponse
+import shutil, tempfile
 
 router = APIRouter()
+
+# 허용 확장자
+ALLOWED_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm"}
+# 최대 영상 길이 (초)
+MAX_DURATION_SECONDS = 60
+
+
+def _error(error: str, message: str, status_code: int = 400) -> JSONResponse:
+    """표준 에러 응답"""
+    return JSONResponse(
+        status_code=status_code,
+        content={"error": error, "message": message},
+    )
+
+
+def _validate_video(filename: str, video_path: str):
+    """
+    확장자 및 길이 검증.
+    문제 있으면 HTTPException raise.
+    """
+    ext = os.path.splitext(filename)[-1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "unsupported_format",
+                "message": f"지원하지 않는 형식입니다: {ext}. 지원 형식: {', '.join(ALLOWED_EXTENSIONS)}",
+            },
+        )
+
+    try:
+        clip = VideoFileClip(video_path)
+        duration = clip.duration
+        clip.close()
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "invalid_video",
+                "message": "영상 파일을 읽을 수 없습니다.",
+            },
+        )
+
+    if duration > MAX_DURATION_SECONDS:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "video_too_long",
+                "message": f"영상 길이가 {MAX_DURATION_SECONDS}초를 초과합니다. (현재: {duration:.1f}초)",
+            },
+        )
+
 
 @router.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     temp_dir = tempfile.mkdtemp()
     temp_path = os.path.join(temp_dir, file.filename)
-    
+
     with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    
+
+    # 업로드 단계에서도 형식/길이 검증
+    _validate_video(file.filename, temp_path)
+
     return {"filename": file.filename, "path": temp_path}
 
 
 @router.post("/analyze")
 async def analyze_video(file: UploadFile = File(...)):
-  
     temp_dir = tempfile.mkdtemp()
     video_path = os.path.join(temp_dir, file.filename)
-    
+
     with open(video_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    
+
+    # ① 형식 및 길이 검증
+    _validate_video(file.filename, video_path)
+
+    # ② AI 분석 + 렌더링
     try:
-        from backend.video_utils import extract_audio, get_still_cut, render_subtitle, render_all_frames
-        from backend.ai import analyze_emotion 
-        
-  
+        from backend.video_utils import extract_audio, render_all_frames
+        from backend.ai import analyze_emotion
+
         audio_path = extract_audio(video_path)
-        emotions = analyze_emotion(audio_path) 
-        
-  
-        output_path = os.path.join(temp_dir, "output_" + file.filename)
-        render_all_frames(video_path, emotions, output_path)
-        
+        segments = analyze_emotion(audio_path)
+
+        output_dir = os.path.join(temp_dir, "output_frames")
+        render_all_frames(video_path, segments, output_dir)
+
+        # video_url은 실제 서빙 경로로 교체 필요 (현재는 로컬 경로 반환)
+        video_url = output_dir
+
         return {
-            "status": "success",
-            "output_path": output_path,
-            "emotions": emotions
+            "segments": segments,
+            "video_url": video_url,
         }
-    
+
     except ImportError as e:
-        raise HTTPException(status_code=500, detail=f"Import 실패 — 구동하한테 카톡: {str(e)}")
-    
+        logger.error(f"[/analyze] ImportError: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "import_error",
+                "message": f"모듈 로드 실패 — 구동하한테 카톡: {str(e)}",
+            },
+        )
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"[/analyze] Unexpected error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "internal_error",
+                "message": str(e),
+            },
+        )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    from fastapi import FastAPI
+
+    app = FastAPI()
+    app.include_router(router)
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)
