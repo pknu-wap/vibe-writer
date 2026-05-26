@@ -3,10 +3,12 @@ from pydub import AudioSegment
 from funasr import AutoModel
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 import numpy as np
+from postprocess import fix_imblance
 
 #input은 mp3나 wav 같은 형태로 넣으면 될 듯?
-#ouput은 [{start:0.0, end:3.0, text:"안녕하세요", angry:0.1, disgust:0.2, fearful:0.3, happy:0.4, neutral:0.5, other:0.6, sad:0.7, surprised:0.8, unknown:0.9}, {start:3.0, end:6.0, text:"반갑습니다", angry:0.1, disgust:0.2, fearful:0.3, happy:0.4, neutral:0.5, other:0.6, sad:0.7, surprised:0.8, unknown:0.9}] 같은 형태로 나옴
+#output은 [{start:0.0, end:3.0, text:"안녕하세요", emotion:"happy"}, {start:3.0, end:6.0, text:"반갑습니다", emotion:"neutral"}] 같은 형태로 나옴
 def analyze_stt(audio_path):
+    final_result = []
     model_emo = AutoModel(
             model="iic/emotion2vec_plus_base",
             hub="hf", )
@@ -58,4 +60,13 @@ def analyze_stt(audio_path):
         video_sub[i]['surprised'] = rec_result[0]['scores'][7]
         video_sub[i]['unknown'] = rec_result[0]['scores'][8]
 
-    return video_sub
+    #찐막 
+    for i in result["segments"]:
+        final_result.append({'start':i['start'],
+                    'end':i['end'],
+                    'text':i['text'],
+                    'emotion':""})
+    for i in range(len(video_sub)):
+        final_result[i]['emotion'] = fix_imbalance(video_sub[i])
+
+    return final_result
