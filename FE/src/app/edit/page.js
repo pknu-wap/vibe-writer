@@ -71,7 +71,7 @@ export default function EditPage() {
 
   const captionEmotion = currentSegment?.emotion ?? selectedEmotion;
   const captionText = currentSegment?.text ?? "";
-  const captionSetting = emotionSettings[captionEmotion];
+  const captionSetting = emotionSettings[captionEmotion] ?? emotionSettings.Neutral;
 
   const updateCurrentEmotionSetting = (key, value) => {
     setEmotionSettings((prev) => ({
