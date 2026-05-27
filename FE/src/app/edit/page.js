@@ -20,7 +20,6 @@ const DEFAULT_EMOTION_SETTINGS = {
   Neutral: { fontSize: 50, position: "하단", effect: "없음", font: "고딕" },
 };
 
-// ✅ 수정 1: desc를 고정 문자열로 선언 — emotionSettings 상태와 무관
 const EMOTIONS = [
   { name: "Happy",   color: "#F5C000", desc: "통통체 · 65px" },
   { name: "Angry",   color: "#E03C3C", desc: "각진체 · 70px" },
@@ -88,7 +87,6 @@ export default function EditPage() {
     );
   };
 
-  // ✅ 수정 2: 참고 코드의 순차 탐색 방식으로 교체 + selectedEmotion 동기화
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -113,7 +111,6 @@ export default function EditPage() {
     });
   };
 
-  // ✅ 수정 3: onLoadedMetadata로 duration 안정적으로 확보
   const handleLoadedMetadata = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -250,7 +247,6 @@ export default function EditPage() {
             <span className="panel-title">감정 설정</span>
           </div>
 
-          {/* ✅ 수정 1: emotion.desc는 고정값이라 상태 변경에 영향 없음 */}
           <div className="emotion-list">
             {EMOTIONS.map((emotion) => (
               <button

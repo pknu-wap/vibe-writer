@@ -62,7 +62,6 @@ button {
   white-space: nowrap;
 }
 
-/* 전체 3분할 */
 .edit-body {
   width: 100vw;
   height: calc(100vh - 100px);
