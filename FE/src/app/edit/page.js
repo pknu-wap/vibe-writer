@@ -158,8 +158,8 @@ export default function EditPage() {
   };
 
   useEffect(() => {
-    const activeEmotion = segments[selectedIndex]?.emotion;
-    if (activeEmotion) setSelectedEmotion(activeEmotion);
+    const activeEmotion = segments[selectedIndex]?.emotion ?? "Neutral";
+    setSelectedEmotion(activeEmotion);
   }, [selectedIndex, segments]);
 
   useEffect(() => {
