@@ -64,7 +64,7 @@ export default function EditPage() {
   const videoId = uploadStore.videoInfo?.video_id;
   const videoSrc = videoId ? `/api/video/${videoId}` : "";
 
-  const currentSetting = emotionSettings[selectedEmotion];
+  const currentSetting = emotionSettings[selectedEmotion] ?? emotionSettings.Neutral;
 
   const currentSegment =
     segments.find((seg) => currentTime >= seg.start && currentTime < seg.end) ?? null;
