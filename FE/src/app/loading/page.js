@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { uploadStore } from "../lib/upload-store";
 
 const BLADE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
-// 측정값에 맞춰 수정
-const ANALYZE_TIME = 18000;
+const ANALYZE_TIME = 31000;
 
 const LOADING_MESSAGE = "AI가 감정을 분석하고 자막을 생성하는 중이에요...";
+
+// 임시 api
+const MOCK_ANALYZE_API = "/api/mock-analyze";
 
 function Spinner() {
   return (
@@ -62,7 +65,8 @@ export default function Loading() {
       try {
         const uploadId = sessionStorage.getItem("uploadId");
 
-        const response = await fetch("/analyze", {
+        // 임시 api 호출
+        const response = await fetch(MOCK_ANALYZE_API, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -73,12 +77,21 @@ export default function Loading() {
         });
 
         if (!response.ok) {
-          throw new Error("analyze 요청 실패");
+          throw new Error("목 서버 analyze 요청 실패");
         }
 
         const result = await response.json();
 
+        
         sessionStorage.setItem("analyzeResult", JSON.stringify(result));
+
+        
+        uploadStore.videoInfo = result.videoInfo ?? {
+          video_id: result.video_id ?? uploadId ?? "mock-video",
+          duration: result.duration ?? 12,
+        };
+
+        uploadStore.segments = result.segments ?? [];
 
         isFinished = true;
         clearInterval(timer);
@@ -105,11 +118,6 @@ export default function Loading() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#180028] via-[#08000f] to-black text-white px-4 py-6">
-      <link
-        href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
-        rel="stylesheet"
-      />
-
       <header className="flex items-center gap-6">
         <Link href="/">
           <h1
