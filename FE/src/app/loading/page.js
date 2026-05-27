@@ -11,8 +11,8 @@ const ANALYZE_TIME = 31000;
 
 const LOADING_MESSAGE = "AI가 감정을 분석하고 자막을 생성하는 중이에요...";
 
-// 임시 api
-const MOCK_ANALYZE_API = "/api/mock-analyze";
+// 임시 API
+const ANALYZE_API = "/api/analyze";
 
 function Spinner() {
   return (
@@ -65,8 +65,7 @@ export default function Loading() {
       try {
         const uploadId = sessionStorage.getItem("uploadId");
 
-        // 임시 api 호출
-        const response = await fetch(MOCK_ANALYZE_API, {
+        const response = await fetch(ANALYZE_API, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -77,15 +76,13 @@ export default function Loading() {
         });
 
         if (!response.ok) {
-          throw new Error("목 서버 analyze 요청 실패");
+          throw new Error("analyze 요청 실패");
         }
 
         const result = await response.json();
 
-        
         sessionStorage.setItem("analyzeResult", JSON.stringify(result));
 
-        
         uploadStore.videoInfo = result.videoInfo ?? {
           video_id: result.video_id ?? uploadId ?? "mock-video",
           duration: result.duration ?? 12,
