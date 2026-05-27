@@ -64,9 +64,13 @@ export default function Loading() {
     async function requestAnalyze() {
       try {
         const uploadId = sessionStorage.getItem("uploadId");
+        const uploadId = sessionStorage.getItem("uploadId");
 
-        // 임시 api 호출
-        const response = await fetch(MOCK_ANALYZE_API, {
+        if (!uploadId) {
+          throw new Error("업로드 ID를 찾을 수 없습니다.");
+        }
+
+        const response = await fetch("/analyze", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
