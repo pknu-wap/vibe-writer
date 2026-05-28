@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from download import router as download_router
 from download_srt import router as download_srt_router
+from video_stream import router as video_router          # ← 추가
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 
 app.include_router(download_router)
 app.include_router(download_srt_router)
+app.include_router(video_router)                          # ← 추가
 
 @app.get("/health")
 def health_check():
