@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import TopNav from "../components/top-nav";
 
 const BLADE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
@@ -81,7 +81,7 @@ export default function Loading() {
         clearInterval(timer);
 
         console.error(error);
-        setErrorText("영상 처리 중 오류가 발생했어요. 다시 시도해주세요.");
+        setErrorText("영상 처리 중 오류가 발생했어요. \n다시 시도해주세요.");
       }
     }
 
@@ -94,34 +94,24 @@ export default function Loading() {
   }, [router]);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#180028] via-[#08000f] to-black text-white px-4 py-6">
+    <div
+     className="min-h-screen overflow-hidden text-white px-4 py-6"
+     style={{
+      background: "linear-gradient(135deg, #190022 0%, #190022 15%, #000000 100%)",
+     }}
+    >
       <link
         href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
         rel="stylesheet"
       />
 
-      <header className="flex items-center gap-6">
-        <Link href="/">
-          <h1
-            className="text-[41px] font-black tracking-[0.08em] hover:opacity-80 -translate-y-2"
-            style={{ fontFamily: "'Nippo', sans-serif" }}
-          >
-            VIBE-WRITER
-          </h1>
-        </Link>
-
-        <p className="text-[18px] text-white/80 tracking-wide">
-          AI 감정 기반 숏폼 자막 자동 생성 서비스
-        </p>
-      </header>
-
-      <div className="-mx-8 mt-1 border-b-2 border-white/80" />
+      <TopNav />
 
       <main className="flex justify-center mt-24">
         <div className="w-full max-w-[530px] h-[500px] rounded-[60px] border-[6px] border-white/80 bg-gradient-to-b from-[#190022] via-[#1e1b27] to-[#3B3B3B] flex flex-col items-center justify-center">
           <Spinner />
 
-          <p className="text-[20px] mb-10 tracking-wide text-center">
+          <p className="text-[20px] mb-10 tracking-wide text-center whitespace-pre-line">
             {errorText ? (
               errorText
             ) : (
@@ -141,7 +131,7 @@ export default function Loading() {
           </div>
 
           <p className="text-[19px] mt-7 tracking-wide text-white/90">
-            {errorText ? "error" : `자막 입히는 중 ... ${percent}%`}
+            {errorText ? "..." : `자막 입히는 중 ... ${percent}%`}
           </p>
         </div>
       </main>
