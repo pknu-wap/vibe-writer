@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+@font-face {
+  font-family: 'Nippo';
+  src: url('/fonts/Nippo-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.intro-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  background: linear-gradient(
+    112.74deg,
+    #190022 5.73%,
+    #000000 89.42%
+  );
+
+  color: white;
+}
+
+
+
+
+.main-image {
+  position: absolute;
+
+  width: 592px;
+  height: 341px;
+
+  left: 688px;
+  top: 242px;
+
+  object-fit: cover;
+
+  opacity: 0.75;
+
+  
+}
+
+
+.main-text {
+  position: absolute;
+
+  left: 97px;
+  top: 396px;
+
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 58px;
+  font-family: 'inter', sans-serif;
+}
+
+
+.main-title {
+  position: absolute;
+
+  left: 97px;
+  top: 496px;
+
+  margin: 0;
+
+  font-size: 128px;
+  font-weight: 700;
+  line-height: 173px;
+
+  letter-spacing: 2px;
+  font-family: 'Nippo', sans-serif;
+}
+
+.start-button {
+  position: absolute;
+  right:80px;
+  bottom: 80px;
+
+  background: transparent;
+  border: none;
+
+  color: rgb(255, 255, 255);
+
+  font-size: 48px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+  font-family: 'inter', sans-serif;
+}
+
+.start-button:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
+}
