@@ -1,9 +1,15 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from download import router as download_router
+from download_srt import router as download_srt_router
+from video_stream import router as video_router          # ← 추가
 
 app = FastAPI()
 
-# 모든 곳에서 접속 가능하도록 설정
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -11,6 +17,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(download_router)
+app.include_router(download_srt_router)
+app.include_router(video_router)                          # ← 추가
 
 @app.get("/health")
 def health_check():

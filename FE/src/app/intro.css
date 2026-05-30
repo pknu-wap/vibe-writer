@@ -28,42 +28,6 @@ body {
 }
 
 
-.top-bar {
-  position: absolute;
-  left: 15px;
-  top: 31px;
-
-  display: flex;
-  align-items: center;
-}
-
-.line {
-  position: absolute;
-  top: 95px;
-  left: -15px;
-
-  width: 100vw;
-
-  height: 3px;
-  background: white;
-}
-
-.logo {
-  font-size: 48px;
-  font-weight: 700;
-  margin: 0;
-
-  letter-spacing: 1px;
-  font-family: 'Nippo', sans-serif;
-}
-
-.service-text {
-  margin-left: 24px;
-
-  font-size: 20px;
-  font-weight: 400;
-  font-family: 'inter', sans-serif;
-}
 
 
 .main-image {

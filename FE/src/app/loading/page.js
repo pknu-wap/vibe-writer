@@ -23,6 +23,7 @@ function Spinner() {
         height="140"
         className="animate-spin"
         style={{ animationDuration: "1.8s" }}
+        aria-hidden="true"
       >
         {BLADE_ANGLES.map((angle) => (
           <rect
@@ -64,6 +65,11 @@ export default function Loading() {
     async function requestAnalyze() {
       try {
         const uploadId = sessionStorage.getItem("uploadId");
+        const uploadId = sessionStorage.getItem("uploadId");
+
+        if (!uploadId) {
+          throw new Error("업로드 ID를 찾을 수 없습니다.");
+        }
 
         const response = await fetch(ANALYZE_API, {
           method: "POST",
