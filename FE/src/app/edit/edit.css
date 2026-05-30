@@ -1,0 +1,535 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+}
+
+.edit-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at 20% 5%,
+      rgba(25, 0, 34, 0.7),
+      transparent 34%
+    ),
+    linear-gradient(135deg, #190022 0%, #08000f 55%, #000000 100%);
+}
+
+/* 상단 헤더 */
+.edit-header {
+  width: 100vw;
+  height: 80px;
+  padding: 18px 24px 14px;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  border-bottom: 5px solid #ffffff;
+}
+
+.logo-link {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.logo-text {
+  margin: 0;
+  font-family: "Nippo", sans-serif;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.service-text {
+  margin: 6px 0 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+}
+
+.edit-body {
+  width: 100vw;
+  height: calc(100vh - 80px);
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr) 240px;
+}
+
+/* 왼쪽 패널 */
+.edit-left {
+  height: 100%;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header-row {
+  height: 52px;
+  min-height: 52px;
+  padding: 0 22px;
+  background: #ffffff;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.panel-close-btn {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: #000000;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* 스타일 설정 */
+.style-settings-box {
+  padding: 16px 22px 14px;
+  background: #000000;
+  flex-shrink: 0;
+}
+
+.setting-group {
+  margin-bottom: 11px;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.setting-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: #ffffff;
+}
+
+.setting-label-row .setting-label {
+  margin-bottom: 0;
+}
+
+.font-size-value {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.font-size-slider {
+  width: 100%;
+  height: 7px;
+  appearance: none;
+  border-radius: 999px;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
+
+.font-size-slider::-webkit-slider-thumb {
+  width: 15px;
+  height: 15px;
+  appearance: none;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #000000;
+  cursor: pointer;
+}
+
+.font-size-slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #000000;
+  cursor: pointer;
+}
+
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.pill-btn {
+  min-width: 45px;
+  height: 20px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pill-btn.selected {
+  background: #9c9c9c;
+}
+
+/* 감정 설정 */
+.emotion-list {
+  flex: 1;
+  min-height: 0;
+  padding: 22px 32px;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.emotion-list::-webkit-scrollbar {
+  width: 0;
+}
+
+.emotion-item {
+  width: 100%;
+  min-height: 46px;
+  border: 3px solid #ffffff;
+  border-radius: 5px;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.emotion-item.active {
+  background: #111111;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
+.emotion-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.emotion-name {
+  margin-left: 10px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.emotion-desc {
+  margin-left: 10px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+}
+
+/* 가운데 영상 영역 */
+.edit-center {
+  height: 100%;
+  border-left: 5px solid #ffffff;
+  border-right: 5px solid #ffffff;
+  background:
+    radial-gradient(
+      circle at 45% 45%,
+      rgba(25, 0, 34, 0.6),
+      transparent 42%
+    ),
+    linear-gradient(180deg, #190022 0%, #1e1b27 55%, #3b3b3b 100%);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.video-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-frame {
+  width: 200px;
+  height: 356px;
+  background: #111111;
+  object-fit: cover;
+  display: block;
+}
+
+.empty-video {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  background: #111111;
+}
+
+/* 영상 위 자막 */
+.caption-preview {
+  position: absolute;
+  left: 50%;
+  width: 90%;
+  z-index: 5;
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+  word-break: keep-all;
+}
+
+.caption-bounce {
+  animation: captionBounce 0.6s ease infinite alternate;
+}
+
+.caption-fade {
+  animation: captionFade 1.2s ease infinite alternate;
+}
+
+.caption-shake {
+  animation: captionShake 0.2s ease infinite;
+}
+
+@keyframes captionBounce {
+  from {
+    margin-bottom: 0;
+  }
+
+  to {
+    margin-bottom: 10px;
+  }
+}
+
+@keyframes captionFade {
+  from {
+    opacity: 0.35;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes captionShake {
+  0% {
+    margin-left: 0;
+  }
+
+  25% {
+    margin-left: -4px;
+  }
+
+  50% {
+    margin-left: 4px;
+  }
+
+  75% {
+    margin-left: -4px;
+  }
+
+  100% {
+    margin-left: 0;
+  }
+}
+
+/* 영상 컨트롤 */
+.video-controls {
+  height: 44px;
+  min-height: 44px;
+  background: #dedede;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  color: #000000;
+}
+
+.play-btn {
+  width: 27px;
+  height: 27px;
+  border: 0;
+  border-radius: 50%;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.progress-track {
+  flex: 1;
+  height: 9px;
+  border-radius: 999px;
+  background: #ffffff;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #222222;
+}
+
+.time-label {
+  min-width: 60px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* 오른쪽 스크립트 */
+.edit-right {
+  height: 100%;
+  background: #000000;
+  padding: 38px 18px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.script-title {
+  margin: 0 0 18px 8px;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.scroll-arrow {
+  width: 100%;
+  height: 16px;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.script-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.script-list::-webkit-scrollbar {
+  width: 0;
+}
+
+.script-empty-message {
+  width: 100%;
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: #707070;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.script-item {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 0;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.script-item:nth-child(odd) {
+  background: #707070;
+}
+
+.script-item.selected-script {
+  background: #1e3a6e;
+}
+
+.script-time {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #26375d;
+  color: #8fb0ff;
+  font-size: 9px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.script-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.script-text {
+  font-size: 14px;
+  font-weight: 700;
+  word-break: keep-all;
+}
+
+.script-emotion {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.script-footer {
+  margin-top: 16px;
+}
+
+.done-btn {
+  width: 100%;
+  height: 37px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.done-btn:hover {
+  background: #dedede;
+}
