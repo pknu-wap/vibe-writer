@@ -94,12 +94,7 @@ export default function Loading() {
   }, [router]);
 
   return (
-    <div
-     className="min-h-screen overflow-hidden text-white px-4 py-6"
-     style={{
-      background: "linear-gradient(135deg, #190022 0%, #190022 15%, #000000 100%)",
-     }}
-    >
+    <div className="min-h-screen overflow-hidden text-white px-4 py-6 bg-[linear-gradient(135deg,#190022_0%,#190022_15%,#000000_100%)]">
       <link
         href="https://api.fontshare.com/v2/css?f[]=nippo@700,900&display=swap"
         rel="stylesheet"
