@@ -4,15 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { uploadStore } from "../lib/upload-store";
-import TopNav from "../components/top-nav";
+
 const BLADE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
 const ANALYZE_TIME = 31000;
 
 const LOADING_MESSAGE = "AI가 감정을 분석하고 자막을 생성하는 중이에요...";
 
-// 임시 API
-const ANALYZE_API = "/api/analyze";
+// 임시 api
+const MOCK_ANALYZE_API = "/api/mock-analyze";
 
 function Spinner() {
   return (
@@ -71,7 +71,7 @@ export default function Loading() {
           throw new Error("업로드 ID를 찾을 수 없습니다.");
         }
 
-        const response = await fetch(ANALYZE_API, {
+        const response = await fetch("/analyze", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -82,13 +82,15 @@ export default function Loading() {
         });
 
         if (!response.ok) {
-          throw new Error("analyze 요청 실패");
+          throw new Error("목 서버 analyze 요청 실패");
         }
 
         const result = await response.json();
 
+        
         sessionStorage.setItem("analyzeResult", JSON.stringify(result));
 
+        
         uploadStore.videoInfo = result.videoInfo ?? {
           video_id: result.video_id ?? uploadId ?? "mock-video",
           duration: result.duration ?? 12,
@@ -120,8 +122,23 @@ export default function Loading() {
   }, [router]);
 
   return (
-    <div className="min-h-screen overflow-hidden text-white px-4 py-6 bg-[linear-gradient(135deg,#190022_0%,#190022_15%,#000000_100%)]">
-      <TopNav />
+    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#180028] via-[#08000f] to-black text-white px-4 py-6">
+      <header className="flex items-center gap-6">
+        <Link href="/">
+          <h1
+            className="text-[41px] font-black tracking-[0.08em] hover:opacity-80 -translate-y-2"
+            style={{ fontFamily: "'Nippo', sans-serif" }}
+          >
+            VIBE-WRITER
+          </h1>
+        </Link>
+
+        <p className="text-[18px] text-white/80 tracking-wide">
+          AI 감정 기반 숏폼 자막 자동 생성 서비스
+        </p>
+      </header>
+
+      <div className="-mx-8 mt-1 border-b-2 border-white/80" />
 
       <main className="flex justify-center mt-24">
         <div className="w-full max-w-[530px] h-[500px] rounded-[60px] border-[6px] border-white/80 bg-gradient-to-b from-[#190022] via-[#1e1b27] to-[#3B3B3B] flex flex-col items-center justify-center">
