@@ -1,25 +1,22 @@
+import os
 from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 router = APIRouter()
 
-# ⚠️ 우하진과 실제 저장 경로·파일명 합의 필요
-VIDEOS_DIR = Path("out/videos")
+# upload.py와 같은 폴더, 같은 이름 규칙으로 통일
+UPLOAD_DIR = Path(os.path.dirname(__file__)) / "uploads"
 
 
 @router.get("/videos/{video_id}")
 async def stream_video(video_id: str):
-    # 경로 조작 방지
     if "/" in video_id or "\\" in video_id or ".." in video_id:
         raise HTTPException(status_code=400, detail="Invalid video_id")
 
-    # 파일 경로 구성
-    video_path = VIDEOS_DIR / f"{video_id}.mp4"
+    video_path = UPLOAD_DIR / f"{video_id}.mp4"
 
-    # 파일 없으면 404
     if not video_path.exists():
         raise HTTPException(status_code=404, detail="Video not found")
 
-    # FileResponse 반환 (Range 요청 자동 지원 → seek 가능)
-    return FileResponse(path=video_path, media_type="video/mp4")
+    return FileResponse(path=str(video_path), media_type="video/mp4")
