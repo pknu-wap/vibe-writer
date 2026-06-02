@@ -65,7 +65,6 @@ export default function Loading() {
     async function requestAnalyze() {
       try {
         const uploadId = sessionStorage.getItem("uploadId");
-        const uploadId = sessionStorage.getItem("uploadId");
 
         if (!uploadId) {
           throw new Error("업로드 ID를 찾을 수 없습니다.");
