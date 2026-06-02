@@ -1,8 +1,11 @@
+import os
 import whisper
 from pydub import AudioSegment
 from funasr import AutoModel
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 import numpy as np
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
 from postprocess import fix_imbalance
 
 #input은 mp3나 wav 같은 형태로 넣으면 될 듯?
@@ -61,9 +64,23 @@ def analyze_stt(audio_path):
         video_sub[i]['unknown'] = rec_result[0]['scores'][8]
 
     for sub in video_sub:
-        final_result.append({'start':sub['start'],
-                    'end':sub['end'],
-                    'text':sub['text'],
-                    'emotion':fix_imbalance(sub)})
+    # postprocess.py와 키 이름 맞추기
+    scores = {
+        "angry": sub["angry"],
+        "disgusted": sub["disgust"],
+        "fearful": sub["fearful"],
+        "happy": sub["happy"],
+        "neutral": sub["neutral"],
+        "other": sub["other"],
+        "sad": sub["sad"],
+        "surprised": sub["surprised"],
+        "<unk>": sub["unknown"],
+    }
+    final_result.append({
+        "start": sub["start"],
+        "end": sub["end"],
+        "text": sub["text"],
+        "emotion": fix_imbalance(scores),
+    })
 
     return final_result
