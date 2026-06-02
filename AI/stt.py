@@ -22,12 +22,12 @@ def analyze_stt(audio_path):
     video_sub = []
     for i in result["segments"]:
         video_sub.append({
-            "start": i["start"],
-            "end": i["end"],
-            "text": i["text"],
-            "angry": 0.0, "disgust": 0.0, "fearful": 0.0,
-            "happy": 0.0, "neutral": 0.0, "other": 0.0,
-            "sad": 0.0, "surprised": 0.0, "unknown": 0.0,
+            "start":i["start"],
+            "end":i["end"],
+            "text":i["text"],
+            "angry":0.0, "disgusted":0.0, "fearful":0.0,
+            "happy": 0.0, "neutral": 0.0, "other":0.0,
+            "sad": 0.0, "surprised":0.0, "<unk>":0.0,
         })
 
     for i in range(len(video_sub)):
@@ -48,33 +48,22 @@ def analyze_stt(audio_path):
 
         scores = rec_result[0]["scores"]
         video_sub[i]["angry"] = scores[0]
-        video_sub[i]["disgust"] = scores[1]
+        video_sub[i]["disgusted"] = scores[1]
         video_sub[i]["fearful"] = scores[2]
         video_sub[i]["happy"] = scores[3]
         video_sub[i]["neutral"] = scores[4]
         video_sub[i]["other"] = scores[5]
         video_sub[i]["sad"] = scores[6]
         video_sub[i]["surprised"] = scores[7]
-        video_sub[i]["unknown"] = scores[8]
+        video_sub[i]["<unk>"] = scores[8]
 
-    # ⭐ 이 for문이 핵심 — 들여쓰기 정확히
+    
     for sub in video_sub:
-        scores = {
-            "angry": sub["angry"],
-            "disgusted": sub["disgust"],
-            "fearful": sub["fearful"],
-            "happy": sub["happy"],
-            "neutral": sub["neutral"],
-            "other": sub["other"],
-            "sad": sub["sad"],
-            "surprised": sub["surprised"],
-            "<unk>": sub["unknown"],
-        }
         final_result.append({
-            "start": sub["start"],
-            "end": sub["end"],
-            "text": sub["text"],
-            "emotion": fix_imbalance(scores),
+            "start":np.float64(sub["start"]),
+            "end":np.float64(sub["end"]),
+            "text":sub["text"],
+            "emotion":fix_imbalance(scores),
         })
 
     return final_result
