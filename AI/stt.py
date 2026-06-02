@@ -26,7 +26,7 @@ def analyze_stt(audio_path):
             "end":i["end"],
             "text":i["text"],
             "angry":0.0, "disgusted":0.0, "fearful":0.0,
-            "happy": 0.0, "neutral": 0.0, "other":0.0,
+            "happy":0.0, "neutral":0.0, "other":0.0,
             "sad": 0.0, "surprised":0.0, "<unk>":0.0,
         })
 
