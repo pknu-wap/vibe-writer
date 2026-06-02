@@ -63,24 +63,24 @@ def analyze_stt(audio_path):
         video_sub[i]['surprised'] = rec_result[0]['scores'][7]
         video_sub[i]['unknown'] = rec_result[0]['scores'][8]
 
-    for sub in video_sub:
-    # postprocess.py와 키 이름 맞추기
-    scores = {
-        "angry": sub["angry"],
-        "disgusted": sub["disgust"],
-        "fearful": sub["fearful"],
-        "happy": sub["happy"],
-        "neutral": sub["neutral"],
-        "other": sub["other"],
-        "sad": sub["sad"],
-        "surprised": sub["surprised"],
-        "<unk>": sub["unknown"],
-    }
-    final_result.append({
-        "start": sub["start"],
-        "end": sub["end"],
-        "text": sub["text"],
-        "emotion": fix_imbalance(scores),
-    })
+for sub in video_sub:
+        # postprocess.py와 키 이름 맞추기
+        scores = {
+            "angry": sub["angry"],
+            "disgusted": sub["disgust"],
+            "fearful": sub["fearful"],
+            "happy": sub["happy"],
+            "neutral": sub["neutral"],
+            "other": sub["other"],
+            "sad": sub["sad"],
+            "surprised": sub["surprised"],
+            "<unk>": sub["unknown"],
+        }
+        final_result.append({
+            "start": sub["start"],
+            "end": sub["end"],
+            "text": sub["text"],
+            "emotion": fix_imbalance(scores),
+        })
 
     return final_result
