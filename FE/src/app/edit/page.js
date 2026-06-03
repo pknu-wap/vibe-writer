@@ -89,7 +89,7 @@ const getCaptionPositionStyle = (position) => {
 const getCaptionFontFamily = (font) => {
   if (font === "통통체") return "'Arial Rounded MT Bold', sans-serif";
   if (font === "각진체") return "'Impact', sans-serif";
-  if (font === "얇은체") return "'Arial', sans-serif";
+  if (font === "고딕") return "'Malgun Gothic', sans-serif";
   return "'Arial', sans-serif";
 };
 
