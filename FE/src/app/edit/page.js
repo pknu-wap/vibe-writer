@@ -104,6 +104,7 @@ const makeSubtitlePayload = (segments, emotionSettings) => {
       text: segment.text,
       emotion,
 
+      // 백엔드에서 ASS 자막 스타일 만들 때 사용할 값
       color: EMOTION_COLORS[emotion] ?? "#FFFFFF",
       font: setting.font,
       fontSize: setting.fontSize,
@@ -124,6 +125,7 @@ export default function EditPage() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [segments, setSegments] = useState(uploadStore.segments ?? []);
   const [duration, setDuration] = useState(uploadStore.videoInfo?.duration ?? 0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const videoId = uploadStore.videoInfo?.video_id;
   const videoSrc = videoId ? `/api/video/${videoId}` : "";
@@ -237,7 +239,9 @@ export default function EditPage() {
     });
   };
 
-  const handleCompleteEdit = () => {
+  const handleCompleteEdit = async () => {
+    if (isSubmitting) return;
+
     const subtitleData = makeSubtitlePayload(segments, emotionSettings);
 
     const finalPayload = {
@@ -248,9 +252,37 @@ export default function EditPage() {
 
     uploadStore.finalPayload = finalPayload;
 
-    console.log("백엔드로 넘길 최종 데이터:", finalPayload);
+    console.log("백엔드로 보낼 최종 데이터:", finalPayload);
 
-    router.push("/loading-final");
+    try {
+      setIsSubmitting(true);
+
+      const response = await fetch("/api/final", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(finalPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error("최종 영상 생성 요청 실패");
+      }
+
+      const result = await response.json();
+
+      // 백엔드에서 반환한 다운로드 결과 저장
+      uploadStore.finalResult = result;
+
+      console.log("백엔드에서 받은 다운로드 결과:", result);
+
+      router.push("/download");
+    } catch (error) {
+      console.error("편집 완료 처리 중 오류:", error);
+      alert("최종 영상 생성 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -536,8 +568,9 @@ export default function EditPage() {
               type="button"
               className="done-btn"
               onClick={handleCompleteEdit}
+              disabled={isSubmitting}
             >
-              편집 완료
+              {isSubmitting ? "처리 중..." : "편집 완료"}
             </button>
           </div>
         </aside>
