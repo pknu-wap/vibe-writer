@@ -46,7 +46,6 @@ def analyze_stt(audio_path):
             extract_embedding=False,
         )
 
-        scores = rec_result[0]["scores"]
         video_sub[i]["angry"] = scores[0]
         video_sub[i]["disgusted"] = scores[1]
         video_sub[i]["fearful"] = scores[2]
@@ -63,7 +62,7 @@ def analyze_stt(audio_path):
             "start":np.float64(sub["start"]),
             "end":np.float64(sub["end"]),
             "text":sub["text"],
-            "emotion":fix_imbalance(scores),
+            "emotion":fix_imbalance(sub),
         })
 
     return final_result
