@@ -14,16 +14,36 @@ const EMOTION_COLORS = {
 };
 
 const DEFAULT_EMOTION_SETTINGS = {
-  Happy: { fontSize: 65, position: "하단", effect: "바운스", font: "통통체" },
-  Angry: { fontSize: 70, position: "하단", effect: "쉐이크", font: "각진체" },
-  Sad:   { fontSize: 45, position: "하단", effect: "페이드", font: "얇은체" },
-  Neutral: { fontSize: 50, position: "하단", effect: "없음", font: "고딕" },
+  Happy: {
+    fontSize: 65,
+    position: "하단",
+    effect: "바운스",
+    font: "통통체",
+  },
+  Angry: {
+    fontSize: 70,
+    position: "하단",
+    effect: "쉐이크",
+    font: "각진체",
+  },
+  Sad: {
+    fontSize: 45,
+    position: "하단",
+    effect: "페이드",
+    font: "얇은체",
+  },
+  Neutral: {
+    fontSize: 50,
+    position: "하단",
+    effect: "없음",
+    font: "고딕",
+  },
 };
 
 const EMOTIONS = [
-  { name: "Happy",   color: "#F5C000", desc: "통통체 · 65px" },
-  { name: "Angry",   color: "#E03C3C", desc: "각진체 · 70px" },
-  { name: "Sad",     color: "#4A9FE0", desc: "얇은체 · 45px" },
+  { name: "Happy", color: "#F5C000", desc: "통통체 · 65px" },
+  { name: "Angry", color: "#E03C3C", desc: "각진체 · 70px" },
+  { name: "Sad", color: "#4A9FE0", desc: "얇은체 · 45px" },
   { name: "Neutral", color: "#FFFFFF", desc: "고딕 · 50px" },
 ];
 
@@ -43,9 +63,53 @@ const formatTime = (seconds = 0) => {
 };
 
 const getCaptionPositionStyle = (position) => {
-  if (position === "상단") return { top: "8%", bottom: "auto", transform: "translateX(-50%)" };
-  if (position === "중앙") return { top: "50%", bottom: "auto", transform: "translate(-50%, -50%)" };
-  return { bottom: "8%", top: "auto", transform: "translateX(-50%)" };
+  if (position === "상단") {
+    return {
+      top: "8%",
+      bottom: "auto",
+      transform: "translateX(-50%)",
+    };
+  }
+
+  if (position === "중앙") {
+    return {
+      top: "50%",
+      bottom: "auto",
+      transform: "translate(-50%, -50%)",
+    };
+  }
+
+  return {
+    bottom: "8%",
+    top: "auto",
+    transform: "translateX(-50%)",
+  };
+};
+
+const getCaptionFontFamily = (font) => {
+  if (font === "통통체") return "'Arial Rounded MT Bold', sans-serif";
+  if (font === "각진체") return "'Impact', sans-serif";
+  if (font === "얇은체") return "'Arial', sans-serif";
+  return "'Arial', sans-serif";
+};
+
+const makeSubtitlePayload = (segments, emotionSettings) => {
+  return segments.map((segment) => {
+    const emotion = segment.emotion ?? "Neutral";
+    const setting = emotionSettings[emotion] ?? emotionSettings.Neutral;
+
+    return {
+      start: segment.start,
+      end: segment.end,
+      text: segment.text,
+      emotion,
+
+      color: EMOTION_COLORS[emotion] ?? "#FFFFFF",
+      font: setting.font,
+      fontSize: setting.fontSize,
+      position: setting.position,
+    };
+  });
 };
 
 export default function EditPage() {
@@ -67,7 +131,8 @@ export default function EditPage() {
   const currentSetting = emotionSettings[selectedEmotion] ?? emotionSettings.Neutral;
 
   const currentSegment =
-    segments.find((seg) => currentTime >= seg.start && currentTime < seg.end) ?? null;
+    segments.find((seg) => currentTime >= seg.start && currentTime < seg.end) ??
+    null;
 
   const captionEmotion = currentSegment?.emotion ?? selectedEmotion;
   const captionText = currentSegment?.text ?? "";
@@ -76,14 +141,20 @@ export default function EditPage() {
   const updateCurrentEmotionSetting = (key, value) => {
     setEmotionSettings((prev) => ({
       ...prev,
-      [selectedEmotion]: { ...prev[selectedEmotion], [key]: value },
+      [selectedEmotion]: {
+        ...prev[selectedEmotion],
+        [key]: value,
+      },
     }));
   };
 
   const selectEmotion = (emotion) => {
     setSelectedEmotion(emotion);
+
     setSegments((prev) =>
-      prev.map((seg, i) => (i === selectedIndex ? { ...seg, emotion } : seg))
+      prev.map((seg, index) =>
+        index === selectedIndex ? { ...seg, emotion } : seg
+      )
     );
   };
 
@@ -97,9 +168,13 @@ export default function EditPage() {
     if (segments.length === 0) return;
 
     let idx = 0;
+
     for (let i = 0; i < segments.length; i++) {
-      if (segments[i].start <= time) idx = i;
-      else break;
+      if (segments[i].start <= time) {
+        idx = i;
+      } else {
+        break;
+      }
     }
 
     setSelectedIndex((prev) => {
@@ -107,6 +182,7 @@ export default function EditPage() {
         setSelectedEmotion(segments[idx]?.emotion ?? "Neutral");
         return idx;
       }
+
       return prev;
     });
   };
@@ -114,25 +190,30 @@ export default function EditPage() {
   const handleLoadedMetadata = () => {
     const video = videoRef.current;
     if (!video) return;
+
     setDuration(video.duration || uploadStore.videoInfo?.duration || 0);
   };
 
   const togglePlay = () => {
     const video = videoRef.current;
     if (!video) return;
+
     if (isPlaying) {
       video.pause();
     } else {
       video.play();
     }
+
     setIsPlaying((prev) => !prev);
   };
 
   const handleProgressClick = (event) => {
     const video = videoRef.current;
     if (!video || !duration) return;
+
     const rect = event.currentTarget.getBoundingClientRect();
     const ratio = (event.clientX - rect.left) / rect.width;
+
     video.currentTime = ratio * duration;
   };
 
@@ -140,20 +221,35 @@ export default function EditPage() {
     setSelectedIndex(index);
     setCurrentTime(start);
     setSelectedEmotion(segments[index]?.emotion ?? "Neutral");
+
     const video = videoRef.current;
     if (!video) return;
+
     video.pause();
     video.currentTime = start;
     setIsPlaying(false);
   };
 
   const scrollScript = (direction) => {
-    scriptListRef.current?.scrollBy({ top: direction * 80, behavior: "smooth" });
+    scriptListRef.current?.scrollBy({
+      top: direction * 80,
+      behavior: "smooth",
+    });
   };
 
   const handleCompleteEdit = () => {
-    uploadStore.segments = segments;
-    uploadStore.emotionSettings = emotionSettings;
+    const subtitleData = makeSubtitlePayload(segments, emotionSettings);
+
+    const finalPayload = {
+      video_id: videoId,
+      subtitleFormat: "ass",
+      subtitles: subtitleData,
+    };
+
+    uploadStore.finalPayload = finalPayload;
+
+    console.log("백엔드로 넘길 최종 데이터:", finalPayload);
+
     router.push("/loading-final");
   };
 
@@ -169,7 +265,9 @@ export default function EditPage() {
         togglePlay();
       }
     };
+
     document.addEventListener("keydown", handleKeyDown);
+
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isPlaying]);
 
@@ -179,65 +277,102 @@ export default function EditPage() {
         <Link href="/" className="logo-link">
           <h1 className="logo-text">VIBE-WRITER</h1>
         </Link>
-        <p className="service-text">AI 감정 기반 숏폼 자막 자동 생성 서비스</p>
+
+        <p className="service-text">
+          AI 감정 기반 숏폼 자막 자동 생성 서비스
+        </p>
       </header>
 
       <div className="edit-body">
         <aside className="edit-left">
           <div className="panel-header-row">
             <span className="panel-title">스타일 설정</span>
-            <button type="button" className="panel-close-btn">✕</button>
+            <button type="button" className="panel-close-btn">
+              ✕
+            </button>
           </div>
 
           <div className="style-settings-box">
             <div className="setting-group">
               <div className="setting-label-row">
                 <span className="setting-label">글자 크기</span>
-                <span className="font-size-value">{currentSetting.fontSize}px</span>
+                <span className="font-size-value">
+                  {currentSetting.fontSize}px
+                </span>
               </div>
+
               <input
-                type="range" min={10} max={100}
+                type="range"
+                min={10}
+                max={100}
                 value={currentSetting.fontSize}
-                onChange={(e) => updateCurrentEmotionSetting("fontSize", Number(e.target.value))}
+                onChange={(e) =>
+                  updateCurrentEmotionSetting(
+                    "fontSize",
+                    Number(e.target.value)
+                  )
+                }
                 className="font-size-slider"
               />
             </div>
 
             <div className="setting-group">
               <span className="setting-label">위치</span>
+
               <div className="pill-group">
                 {["하단", "중앙", "상단"].map((item) => (
                   <button
-                    type="button" key={item}
-                    className={`pill-btn${currentSetting.position === item ? " selected" : ""}`}
-                    onClick={() => updateCurrentEmotionSetting("position", item)}
-                  >{item}</button>
+                    type="button"
+                    key={item}
+                    className={`pill-btn${
+                      currentSetting.position === item ? " selected" : ""
+                    }`}
+                    onClick={() =>
+                      updateCurrentEmotionSetting("position", item)
+                    }
+                  >
+                    {item}
+                  </button>
                 ))}
               </div>
             </div>
 
             <div className="setting-group">
               <span className="setting-label">효과</span>
+
               <div className="pill-group">
                 {["바운스", "페이드", "쉐이크", "없음"].map((item) => (
                   <button
-                    type="button" key={item}
-                    className={`pill-btn${currentSetting.effect === item ? " selected" : ""}`}
-                    onClick={() => updateCurrentEmotionSetting("effect", item)}
-                  >{item}</button>
+                    type="button"
+                    key={item}
+                    className={`pill-btn${
+                      currentSetting.effect === item ? " selected" : ""
+                    }`}
+                    onClick={() =>
+                      updateCurrentEmotionSetting("effect", item)
+                    }
+                  >
+                    {item}
+                  </button>
                 ))}
               </div>
             </div>
 
             <div className="setting-group">
               <span className="setting-label">폰트</span>
+
               <div className="pill-group">
                 {FONT_OPTIONS.map((item) => (
                   <button
-                    type="button" key={item}
-                    className={`pill-btn${currentSetting.font === item ? " selected" : ""}`}
+                    type="button"
+                    key={item}
+                    className={`pill-btn${
+                      currentSetting.font === item ? " selected" : ""
+                    }`}
                     onClick={() => updateCurrentEmotionSetting("font", item)}
-                  >{item}</button>
+                  >
+                    {item}
+                  </button>
                 ))}
               </div>
             </div>
@@ -250,11 +385,17 @@ export default function EditPage() {
           <div className="emotion-list">
             {EMOTIONS.map((emotion) => (
               <button
-                type="button" key={emotion.name}
-                className={`emotion-item${selectedEmotion === emotion.name ? " active" : ""}`}
+                type="button"
+                key={emotion.name}
+                className={`emotion-item${
+                  selectedEmotion === emotion.name ? " active" : ""
+                }`}
                 onClick={() => selectEmotion(emotion.name)}
               >
-                <span className="emotion-dot" style={{ backgroundColor: emotion.color }} />
+                <span
+                  className="emotion-dot"
+                  style={{ backgroundColor: emotion.color }}
+                />
                 <span className="emotion-name">{emotion.name}</span>
                 <span className="emotion-desc">{emotion.desc}</span>
               </button>
@@ -264,38 +405,48 @@ export default function EditPage() {
 
         <main className="edit-center">
           <div className="video-area">
-            {videoSrc ? (
-              <video
-                ref={videoRef}
-                src={videoSrc}
-                className="video-frame"
-                onLoadedMetadata={handleLoadedMetadata}
-                onTimeUpdate={handleTimeUpdate}
-                onEnded={() => setIsPlaying(false)}
-              />
-            ) : (
-              <div className="video-frame empty-video">영상을 불러오는 중입니다</div>
-            )}
+            <div className="video-wrapper">
+              {videoSrc ? (
+                <video
+                  ref={videoRef}
+                  src={videoSrc}
+                  className="video-frame"
+                  onLoadedMetadata={handleLoadedMetadata}
+                  onTimeUpdate={handleTimeUpdate}
+                  onEnded={() => setIsPlaying(false)}
+                />
+              ) : (
+                <div className="video-frame empty-video">
+                  영상을 불러오는 중입니다
+                </div>
+              )}
 
-            {captionText && (
-              <div
-                className={`caption-preview ${EFFECT_CLASS[captionSetting.effect]}`}
-                style={{
-                  color: EMOTION_COLORS[captionEmotion] ?? "#FFFFFF",
-                  fontSize: `${captionSetting.fontSize}px`,
-                  fontFamily: "Arial, sans-serif",
-                  fontWeight: captionSetting.font === "고딕" ? 700 : 900,
-                  ...getCaptionPositionStyle(captionSetting.position),
-                }}
-              >
-                {captionText}
-              </div>
-            )}
+              {captionText && (
+                <div
+                  className={`caption-preview ${
+                    EFFECT_CLASS[captionSetting.effect]
+                  }`}
+                  style={{
+                    color: EMOTION_COLORS[captionEmotion] ?? "#FFFFFF",
+                    fontSize: `${captionSetting.fontSize}px`,
+                    fontFamily: getCaptionFontFamily(captionSetting.font),
+                    fontWeight: captionSetting.font === "얇은체" ? 400 : 900,
+                    ...getCaptionPositionStyle(captionSetting.position),
+                  }}
+                >
+                  {captionText}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="video-controls">
-            <button type="button" className="play-btn" onClick={togglePlay}
-              aria-label={isPlaying ? "일시정지" : "재생"}>
+            <button
+              type="button"
+              className="play-btn"
+              onClick={togglePlay}
+              aria-label={isPlaying ? "일시정지" : "재생"}
+            >
               {isPlaying ? (
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="white">
                   <rect x="3" y="2" width="5" height="16" rx="1" />
@@ -311,7 +462,11 @@ export default function EditPage() {
             <div className="progress-track" onClick={handleProgressClick}>
               <div
                 className="progress-fill"
-                style={{ width: duration ? `${(currentTime / duration) * 100}%` : "0%" }}
+                style={{
+                  width: duration
+                    ? `${(currentTime / duration) * 100}%`
+                    : "0%",
+                }}
               />
             </div>
 
@@ -324,23 +479,42 @@ export default function EditPage() {
         <aside className="edit-right">
           <div className="script-title">스크립트</div>
 
-          <button type="button" className="scroll-arrow" onClick={() => scrollScript(-1)}>▲</button>
+          <button
+            type="button"
+            className="scroll-arrow"
+            onClick={() => scrollScript(-1)}
+          >
+            ▲
+          </button>
 
           <div className="script-list" ref={scriptListRef}>
             {segments.length === 0 ? (
-              <div className="script-empty-message">분석된 자막이 없습니다.</div>
+              <div className="script-empty-message">
+                분석된 자막이 없습니다.
+              </div>
             ) : (
               segments.map((segment, index) => (
                 <button
-                  type="button" key={index}
-                  className={`script-item${selectedIndex === index ? " selected-script" : ""}`}
+                  type="button"
+                  key={index}
+                  className={`script-item${
+                    selectedIndex === index ? " selected-script" : ""
+                  }`}
                   onClick={() => seekToSegment(index, segment.start)}
                 >
-                  <span className="script-time">{formatTime(segment.start)}</span>
+                  <span className="script-time">
+                    {formatTime(segment.start)}
+                  </span>
+
                   <div className="script-info">
                     <span className="script-text">{segment.text}</span>
-                    <span className="script-emotion"
-                      style={{ color: EMOTION_COLORS[segment.emotion] ?? "#FFFFFF" }}>
+
+                    <span
+                      className="script-emotion"
+                      style={{
+                        color: EMOTION_COLORS[segment.emotion] ?? "#FFFFFF",
+                      }}
+                    >
                       {segment.emotion ?? "Neutral"}
                     </span>
                   </div>
@@ -349,10 +523,20 @@ export default function EditPage() {
             )}
           </div>
 
-          <button type="button" className="scroll-arrow" onClick={() => scrollScript(1)}>▼</button>
+          <button
+            type="button"
+            className="scroll-arrow"
+            onClick={() => scrollScript(1)}
+          >
+            ▼
+          </button>
 
           <div className="script-footer">
-            <button type="button" className="done-btn" onClick={handleCompleteEdit}>
+            <button
+              type="button"
+              className="done-btn"
+              onClick={handleCompleteEdit}
+            >
               편집 완료
             </button>
           </div>
