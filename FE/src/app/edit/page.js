@@ -161,7 +161,7 @@ export default function EditPage() {
         end: seg.end,
         text: seg.text,
         emotion,
-        color: EMOTION_COLORS_MAP[emotion] ?? "#FFFFFF",
+        color: EMOTION_COLORS[emotion] ?? "#FFFFFF",
         font: setting.font,
         fontSize: setting.fontSize,
         position: setting.position,
