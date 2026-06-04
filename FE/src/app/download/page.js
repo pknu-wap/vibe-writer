@@ -6,12 +6,12 @@ import { uploadStore } from "../lib/upload-store";
 export default function DownloadPage() {
   const router = useRouter();
   const videoId = uploadStore.videoInfo?.video_id;
-  const videoSrc = videoId ? `/api/video/${videoId}` : null;
+  const videoSrc = videoId ? `http://34.64.111.6:8000/videos/${videoId}` : null;
 
   const handleVideoDownload = () => {
     if (!videoId) return;
     const a = document.createElement("a");
-    a.href = `/api/download?video_id=${videoId}`;
+    a.href = `http://34.64.111.6:8000/download?video_id=${videoId}`;
     a.download = `vibe_writer_${videoId}.mp4`;
     a.click();
   };
@@ -19,7 +19,7 @@ export default function DownloadPage() {
   const handleAssDownload = () => {
     if (!videoId) return;
     const a = document.createElement("a");
-    a.href = `/api/download-ass?video_id=${videoId}`;
+    a.href = `http://34.64.111.6:8000/download-ass?video_id=${videoId}`;
     a.download = `vibe_writer_${videoId}.ass`;
     a.click();
   };

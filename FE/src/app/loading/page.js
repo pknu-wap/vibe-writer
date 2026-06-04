@@ -8,7 +8,7 @@ import TopNav from "../components/top-nav";
 const BLADE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
 const UPLOAD_API = "http://34.64.111.6:8000/upload";
-const ANALYZE_API = "/api/analyze";
+const ANALYZE_API = "https://646a13a7-540d-4b8a-a7f2-9994beff9b52.mock.pstmn.io/analyze?video_id=vid_20260604_130214";
 
 const LOADING_MESSAGE = "AI가 감정을 분석하고 자막을 생성하는 중이에요";
 
