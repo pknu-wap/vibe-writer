@@ -70,7 +70,7 @@ def analyze_stt(audio_path):
             {
                 "start": float(sub["start"]),
                 "end": float(sub["end"]),
-                "text": sub["text"],
+"text": sub["text"].lstrip() if sub["text"] is not None else "",
                 "emotion": fix_imbalance(sub),
             }
         )
