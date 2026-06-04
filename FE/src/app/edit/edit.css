@@ -279,9 +279,15 @@ button {
   justify-content: center;
 }
 
-.video-frame {
+.video-wrapper {
+  position: relative;
   width: 200px;
   height: 356px;
+}
+
+.video-frame {
+  width: 100%;
+  height: 100%;
   background: #111111;
   object-fit: cover;
   display: block;
