@@ -18,10 +18,10 @@ OUTPUT_ASS_DIR.mkdir(parents=True, exist_ok=True)
 # ── 매핑 테이블 ────────────────────────────
 # 한글 폰트명 → 시스템 설치된 폰트명 (개발은 일단 맑은 고딕으로 통일, 추후 교체 가능)
 FONT_MAP = {
-    "통통체": "Malgun Gothic",
-    "각진체": "Malgun Gothic",
-    "얇은체": "Malgun Gothic",
-    "고딕": "Malgun Gothic",
+    "통통체": "NanumGothic",
+    "각진체": "NanumGothic",
+    "얇은체": "NanumGothic",
+    "고딕": "NanumGothic",
 }
 
 # 한글 위치 → ASS Alignment (numpad 1~9)
@@ -101,7 +101,7 @@ def build_ass(segments: list[Segment]) -> str:
         start_t = to_ass_time(seg.start)
         end_t = to_ass_time(seg.end)
         color_ass = hex_to_ass_color(seg.color or "#FFFFFF")
-        font_name = FONT_MAP.get(seg.font or "고딕", "Malgun Gothic")
+        font_name = FONT_MAP.get(seg.font or "고딕", "NanumGothic")
         alignment = POSITION_MAP.get(seg.position or "하단", 2)
         font_size = seg.fontSize or 50
 
