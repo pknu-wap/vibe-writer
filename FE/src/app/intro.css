@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 @font-face {
   font-family: 'Nippo';
-  src: url('/fonts/Nippo-Bold.otf') format('opentype');
+  src: url('/vibe-writer/fonts/Nippo-Bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
 }

@@ -11,7 +11,7 @@ export default function Home() {
 
     
       <img
-        src="/images/intro-image.png"
+        src="/vibe-writer/images/intro-image.png"
         alt="main"
         className="main-image"
       />
