@@ -1,9 +1,10 @@
 import os
 import sys
-import whisper
-from pydub import AudioSegment
-from funasr import AutoModel
+
 import numpy as np
+import whisper
+from funasr import AutoModel
+from pydub import AudioSegment
 
 sys.path.insert(0, os.path.dirname(__file__))
 from postprocess import fix_imbalance
@@ -21,14 +22,22 @@ def analyze_stt(audio_path):
 
     video_sub = []
     for i in result["segments"]:
-        video_sub.append({
-            "start":i["start"],
-            "end":i["end"],
-            "text":i["text"],
-            "angry":0.0, "disgusted":0.0, "fearful":0.0,
-            "happy":0.0, "neutral":0.0, "other":0.0,
-            "sad": 0.0, "surprised":0.0, "<unk>":0.0,
-        })
+        video_sub.append(
+            {
+                "start": i["start"],
+                "end": i["end"],
+                "text": i["text"],
+                "angry": 0.0,
+                "disgusted": 0.0,
+                "fearful": 0.0,
+                "happy": 0.0,
+                "neutral": 0.0,
+                "other": 0.0,
+                "sad": 0.0,
+                "surprised": 0.0,
+                "<unk>": 0.0,
+            }
+        )
 
     for i in range(len(video_sub)):
         raw_sound = AudioSegment.from_file(video)
@@ -56,13 +65,14 @@ def analyze_stt(audio_path):
         video_sub[i]["surprised"] = scores[7]
         video_sub[i]["<unk>"] = scores[8]
 
-    
     for sub in video_sub:
-        final_result.append({
-            "start":np.float64(sub["start"]),
-            "end":np.float64(sub["end"]),
-            "text":sub["text"],
-            "emotion":fix_imbalance(sub),
-        })
+        final_result.append(
+            {
+                "start": float(sub["start"]),
+                "end": float(sub["end"]),
+                "text": sub["text"],
+                "emotion": fix_imbalance(sub),
+            }
+        )
 
     return final_result
