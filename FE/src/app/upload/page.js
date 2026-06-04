@@ -2,14 +2,10 @@
 import "./upload.css";
 import TopNav from "../components/top-nav";
 import { useRouter } from "next/navigation";
-// TODO: 프로젝트의 실제 uploadStore 경로에 맞게 임포트 경로를 수정하세요.
-import { useUploadStore } from "@/store/uploadStore"; 
+import { uploadStore } from "../lib/upload-store";
 
 export default function UploadPage() {
   const router = useRouter();
-  // uploadStore에서 video_id를 저장할 수 있는 액션 함수를 가져옵니다.
-  // (스토어 내부의 함수명이 setVideoId가 아니라면 맞춰서 변경해주세요)
-  const { setVideoId } = useUploadStore();
 
   const handleFilechange = async (e) => {
     const file = e.target.files[0];
@@ -32,7 +28,7 @@ export default function UploadPage() {
       // 2. [추가] 백엔드 응답 데이터 파싱 및 uploadStore에 video_id 저장
       const data = await response.json();
       if (data && data.video_id) {
-        setVideoId(data.video_id);
+        uploadStore.videoInfo = { ...uploadStore.videoInfo, video_id: data.video_id };
       }
 
       // 성공 시 로딩 페이지로 이동

@@ -1,9 +1,10 @@
 import os
 import sys
-import whisper
-from pydub import AudioSegment
-from funasr import AutoModel
+
 import numpy as np
+import whisper
+from funasr import AutoModel
+from pydub import AudioSegment
 
 sys.path.insert(0, os.path.dirname(__file__))
 from postprocess import fix_imbalance
@@ -21,14 +22,22 @@ def analyze_stt(audio_path):
 
     video_sub = []
     for i in result["segments"]:
-        video_sub.append({
-            "start": i["start"],
-            "end": i["end"],
-            "text": i["text"],
-            "angry": 0.0, "disgusted": 0.0, "fearful": 0.0,
-            "happy": 0.0, "neutral": 0.0, "other": 0.0,
-            "sad": 0.0, "surprised": 0.0, "<unk>": 0.0,
-        })
+        video_sub.append(
+            {
+                "start": i["start"],
+                "end": i["end"],
+                "text": i["text"],
+                "angry": 0.0,
+                "disgusted": 0.0,
+                "fearful": 0.0,
+                "happy": 0.0,
+                "neutral": 0.0,
+                "other": 0.0,
+                "sad": 0.0,
+                "surprised": 0.0,
+                "<unk>": 0.0,
+            }
+        )
 
     for i in range(len(video_sub)):
         raw_sound = AudioSegment.from_file(video)
@@ -46,7 +55,6 @@ def analyze_stt(audio_path):
             extract_embedding=False,
         )
 
-        scores = rec_result[0]["scores"]
         video_sub[i]["angry"] = scores[0]
         video_sub[i]["disgusted"] = scores[1]
         video_sub[i]["fearful"] = scores[2]
@@ -57,24 +65,14 @@ def analyze_stt(audio_path):
         video_sub[i]["surprised"] = scores[7]
         video_sub[i]["<unk>"] = scores[8]
 
-    # ⭐ 각 segment마다 자기 점수로 emotion 계산
     for sub in video_sub:
-        sub_scores = {
-            "angry": float(sub["angry"]),
-            "disgusted": float(sub["disgusted"]),
-            "fearful": float(sub["fearful"]),
-            "happy": float(sub["happy"]),
-            "neutral": float(sub["neutral"]),
-            "other": float(sub["other"]),
-            "sad": float(sub["sad"]),
-            "surprised": float(sub["surprised"]),
-            "<unk>": float(sub["<unk>"]),
-        }
-        final_result.append({
-            "start": float(sub["start"]),       # np.float64 → float
-            "end": float(sub["end"]),
-            "text": sub["text"].lstrip(),       # 맨 앞 공백 제거
-            "emotion": fix_imbalance(sub_scores),
-        })
+        final_result.append(
+            {
+                "start": float(sub["start"]),
+                "end": float(sub["end"]),
+"text": sub["text"].lstrip() if sub["text"] is not None else "",
+                "emotion": fix_imbalance(sub),
+            }
+        )
 
     return final_result
