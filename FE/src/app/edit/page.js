@@ -257,7 +257,7 @@ export default function EditPage() {
 
     const finalPayload = {
       video_id: videoId,
-      segments: subtitleData,
+      subtitles: subtitleData,
     };
 
     uploadStore.finalPayload = finalPayload;
