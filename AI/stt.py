@@ -8,7 +8,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(__file__))
 from postprocess import fix_imbalance
 
-# ⭐ 모델은 import 시 1회만 로드 (요청마다 다시 로드 X)
+# 모델은 import 시 1회만 로드
 _model_whisper = whisper.load_model("medium")
 _model_emo = AutoModel(model="iic/emotion2vec_plus_base", hub="hf")
 
@@ -25,9 +25,9 @@ def analyze_stt(audio_path):
             "start": i["start"],
             "end": i["end"],
             "text": i["text"],
-            "angry": 0.0, "disgust": 0.0, "fearful": 0.0,
+            "angry": 0.0, "disgusted": 0.0, "fearful": 0.0,
             "happy": 0.0, "neutral": 0.0, "other": 0.0,
-            "sad": 0.0, "surprised": 0.0, "unknown": 0.0,
+            "sad": 0.0, "surprised": 0.0, "<unk>": 0.0,
         })
 
     for i in range(len(video_sub)):
@@ -48,33 +48,33 @@ def analyze_stt(audio_path):
 
         scores = rec_result[0]["scores"]
         video_sub[i]["angry"] = scores[0]
-        video_sub[i]["disgust"] = scores[1]
+        video_sub[i]["disgusted"] = scores[1]
         video_sub[i]["fearful"] = scores[2]
         video_sub[i]["happy"] = scores[3]
         video_sub[i]["neutral"] = scores[4]
         video_sub[i]["other"] = scores[5]
         video_sub[i]["sad"] = scores[6]
         video_sub[i]["surprised"] = scores[7]
-        video_sub[i]["unknown"] = scores[8]
+        video_sub[i]["<unk>"] = scores[8]
 
-    # ⭐ 이 for문이 핵심 — 들여쓰기 정확히
+    # ⭐ 각 segment마다 자기 점수로 emotion 계산
     for sub in video_sub:
-        scores = {
-            "angry": sub["angry"],
-            "disgusted": sub["disgust"],
-            "fearful": sub["fearful"],
-            "happy": sub["happy"],
-            "neutral": sub["neutral"],
-            "other": sub["other"],
-            "sad": sub["sad"],
-            "surprised": sub["surprised"],
-            "<unk>": sub["unknown"],
+        sub_scores = {
+            "angry": float(sub["angry"]),
+            "disgusted": float(sub["disgusted"]),
+            "fearful": float(sub["fearful"]),
+            "happy": float(sub["happy"]),
+            "neutral": float(sub["neutral"]),
+            "other": float(sub["other"]),
+            "sad": float(sub["sad"]),
+            "surprised": float(sub["surprised"]),
+            "<unk>": float(sub["<unk>"]),
         }
         final_result.append({
-            "start": sub["start"],
-            "end": sub["end"],
-            "text": sub["text"],
-            "emotion": fix_imbalance(scores),
+            "start": float(sub["start"]),       # np.float64 → float
+            "end": float(sub["end"]),
+            "text": sub["text"].lstrip(),       # 맨 앞 공백 제거
+            "emotion": fix_imbalance(sub_scores),
         })
 
     return final_result

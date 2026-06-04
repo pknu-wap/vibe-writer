@@ -152,8 +152,25 @@ export default function EditPage() {
   };
 
   const handleCompleteEdit = () => {
-    uploadStore.segments = segments;
+    // segments + emotionSettings를 합쳐서 BE에 보낼 형태로 변환
+    const enrichedSegments = segments.map((seg) => {
+      const emotion = seg.emotion ?? "Neutral";
+      const setting = emotionSettings[emotion] ?? emotionSettings.Neutral;
+      return {
+        start: seg.start,
+        end: seg.end,
+        text: seg.text,
+        emotion,
+        color: EMOTION_COLORS_MAP[emotion] ?? "#FFFFFF",
+        font: setting.font,
+        fontSize: setting.fontSize,
+        position: setting.position,
+      };
+    });
+
+    uploadStore.segments = enrichedSegments;
     uploadStore.emotionSettings = emotionSettings;
+    sessionStorage.setItem("finalSegments", JSON.stringify(enrichedSegments));
     router.push("/loading-final");
   };
 

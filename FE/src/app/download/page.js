@@ -16,11 +16,11 @@ export default function DownloadPage() {
     a.click();
   };
 
-  const handleSrtDownload = () => {
+  const handleAssDownload = () => {
     if (!videoId) return;
     const a = document.createElement("a");
-    a.href = `/api/download-srt?video_id=${videoId}`;
-    a.download = "subtitles.srt";
+    a.href = `/api/download-ass?video_id=${videoId}`;
+    a.download = `vibe_writer_${videoId}.ass`;
     a.click();
   };
 
@@ -62,10 +62,10 @@ export default function DownloadPage() {
           </button>
 
           <button
-            onClick={handleSrtDownload}
+            onClick={handleAssDownload}
             className="w-full h-32 bg-black border-4 border-white rounded-2xl text-white font-black text-3xl hover:bg-white hover:text-black transition-colors duration-200"
           >
-            자막파일(.SRT)다운로드
+            자막파일(.ASS)다운로드
           </button>
 
           <button
