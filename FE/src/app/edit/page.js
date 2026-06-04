@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { uploadStore } from "../lib/upload-store";
+import { API_BASE } from "../lib/api";
 
 const EMOTION_COLORS = {
   Happy: "#F5C000",
@@ -136,7 +137,7 @@ export default function EditPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const videoId = uploadStore.videoInfo?.video_id;
-  const videoSrc = videoId ? `http://34.64.111.6:8000/videos/${videoId}` : "";
+  const videoSrc = videoId ? `${API_BASE}/videos/${videoId}` : "";
 
   const currentSetting =
     emotionSettings[selectedEmotion] ?? emotionSettings.Neutral;
@@ -268,7 +269,7 @@ export default function EditPage() {
 
       console.log(JSON.stringify(finalPayload));
 
-      const response = await fetch("http://34.64.111.6:8000/process", {
+      const response = await fetch(`${API_BASE}/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

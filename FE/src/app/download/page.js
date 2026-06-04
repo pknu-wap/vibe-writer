@@ -2,16 +2,17 @@
 import { useRouter } from "next/navigation";
 import TopNav from "../components/top-nav";
 import { uploadStore } from "../lib/upload-store";
+import { API_BASE } from "../lib/api";
 
 export default function DownloadPage() {
   const router = useRouter();
   const videoId = uploadStore.videoInfo?.video_id;
-  const videoSrc = videoId ? `http://34.64.111.6:8000/videos/${videoId}` : null;
+  const videoSrc = videoId ? `${API_BASE}/videos/${videoId}` : null;
 
   const handleVideoDownload = () => {
     if (!videoId) return;
     const a = document.createElement("a");
-    a.href = `http://34.64.111.6:8000/download?video_id=${videoId}`;
+    a.href = `${API_BASE}/download?video_id=${videoId}`;
     a.download = `vibe_writer_${videoId}.mp4`;
     a.click();
   };
@@ -19,7 +20,7 @@ export default function DownloadPage() {
   const handleAssDownload = () => {
     if (!videoId) return;
     const a = document.createElement("a");
-    a.href = `http://34.64.111.6:8000/download-ass?video_id=${videoId}`;
+    a.href = `${API_BASE}/download-ass?video_id=${videoId}`;
     a.download = `vibe_writer_${videoId}.ass`;
     a.click();
   };
