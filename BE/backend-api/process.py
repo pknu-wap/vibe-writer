@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Optional, Union
+from typing import Optional
 
 router = APIRouter()
 
@@ -14,9 +14,9 @@ OUTPUT_ASS_DIR = Path(os.path.dirname(__file__)) / "output" / "subtitles"
 OUTPUT_VIDEO_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_ASS_DIR.mkdir(parents=True, exist_ok=True)
 
+# FE 미리보기 픽셀값을 ASS 좌표(PlayResY=1920)로 변환할 때 곱하는 배수
+FONT_SIZE_SCALE = 3
 
-# ── 매핑 테이블 ────────────────────────────
-# 한글 폰트명 → 시스템 설치된 폰트명 (개발은 일단 맑은 고딕으로 통일, 추후 교체 가능)
 FONT_MAP = {
     "통통체": "NanumGothic",
     "각진체": "NanumGothic",
@@ -24,16 +24,12 @@ FONT_MAP = {
     "고딕": "NanumGothic",
 }
 
-# 한글 위치 → ASS Alignment (numpad 1~9)
 POSITION_MAP = {
-    "상단": 8,    # top center
-    "중앙": 5,    # middle center
-    "하단": 2,    # bottom center
+    "상단": 8, "중앙": 5, "하단": 2,
     "top": 8, "middle": 5, "bottom": 2, "center": 5,
 }
 
 
-# ── Pydantic 스키마 ────────────────────────
 class Segment(BaseModel):
     start: float
     end: float
@@ -47,12 +43,10 @@ class Segment(BaseModel):
 
 class ProcessRequest(BaseModel):
     video_id: str
-    segments: list[Segment]
+    subtitles: list[Segment]
 
 
-# ── 유틸 함수 ──────────────────────────────
 def hex_to_ass_color(hex_color: str) -> str:
-    """#RRGGBB → &H00BBGGRR (ASS는 BGR 순서)"""
     h = hex_color.lstrip("#").upper()
     if len(h) == 3:
         h = "".join(c * 2 for c in h)
@@ -63,7 +57,6 @@ def hex_to_ass_color(hex_color: str) -> str:
 
 
 def to_ass_time(sec: float) -> str:
-    """0.0 → 0:00:00.00 (센티초)"""
     h = int(sec // 3600)
     m = int((sec % 3600) // 60)
     s = int(sec % 60)
@@ -73,24 +66,21 @@ def to_ass_time(sec: float) -> str:
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 
-def build_ass(segments: list[Segment]) -> str:
-    """Segment 리스트 → ASS 파일 텍스트"""
+def build_ass(segments):
     header = (
         "[Script Info]\n"
         "ScriptType: v4.00+\n"
         "PlayResX: 1080\n"
         "PlayResY: 1920\n"
         "WrapStyle: 0\n"
-        "ScaledBorderAndShadow: yes\n"
-        "\n"
+        "ScaledBorderAndShadow: yes\n\n"
         "[V4+ Styles]\n"
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, "
         "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
         "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
         "Alignment, MarginL, MarginR, MarginV, Encoding\n"
-        "Style: Default,Malgun Gothic,50,&H00FFFFFF,&H000000FF,&H00000000,"
-        "&H80000000,0,0,0,0,100,100,0,0,1,2,1,2,40,40,80,1\n"
-        "\n"
+        "Style: Default,NanumGothic,60,&H00FFFFFF,&H000000FF,&H00000000,"
+        "&H80000000,0,0,0,0,100,100,0,0,1,3,1,2,40,40,80,1\n\n"
         "[Events]\n"
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
         "Effect, Text\n"
@@ -103,17 +93,13 @@ def build_ass(segments: list[Segment]) -> str:
         color_ass = hex_to_ass_color(seg.color or "#FFFFFF")
         font_name = FONT_MAP.get(seg.font or "고딕", "NanumGothic")
         alignment = POSITION_MAP.get(seg.position or "하단", 2)
-        font_size = seg.fontSize or 50
 
-        # 인라인 오버라이드 태그로 segment별 스타일 적용
+        # FE 픽셀값 → ASS 좌표로 스케일업
+        font_size = (seg.fontSize or 20) * FONT_SIZE_SCALE
+
         override = (
-            f"{{\\an{alignment}"
-            f"\\fn{font_name}"
-            f"\\fs{font_size}"
-            f"\\c{color_ass}"
-            f"}}"
+            f"{{\\an{alignment}\\fn{font_name}\\fs{font_size}\\c{color_ass}}}"
         )
-        # 줄바꿈은 \\N (ASS 표준)
         text = seg.text.replace("\n", "\\N").replace("\r", "")
         lines.append(
             f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{override}{text}"
@@ -122,12 +108,8 @@ def build_ass(segments: list[Segment]) -> str:
     return "\n".join(lines) + "\n"
 
 
-# ── 메인 엔드포인트 ────────────────────────
 @router.post("/process")
 async def process_video(req: ProcessRequest):
-    if "/" in req.video_id or "\\" in req.video_id or ".." in req.video_id:
-        raise HTTPException(400, detail="Invalid video_id")
-
     video_path = UPLOAD_DIR / f"{req.video_id}.mp4"
     if not video_path.exists():
         raise HTTPException(404, detail="VIDEO_NOT_FOUND")
@@ -136,12 +118,9 @@ async def process_video(req: ProcessRequest):
     output_ass = OUTPUT_ASS_DIR / f"{req.video_id}.ass"
 
     try:
-        # ① ASS 파일 생성
-        ass_text = build_ass(req.segments)
+        ass_text = build_ass(req.subtitles)
         output_ass.write_text(ass_text, encoding="utf-8")
 
-        # ② ffmpeg로 ASS + MP4 합성
-        # subtitles 필터는 경로에 콜론/슬래시 escape 까다로움 → cwd 지정으로 우회
         ass_filename = output_ass.name
         cmd = [
             "ffmpeg", "-y",
@@ -164,6 +143,5 @@ async def process_video(req: ProcessRequest):
         return {"success": True, "video_id": req.video_id}
 
     except Exception as e:
-        # 실패 마커
         (OUTPUT_VIDEO_DIR / f"{req.video_id}.failed").touch()
         raise HTTPException(500, detail=f"PROCESS_FAILED: {str(e)}")
