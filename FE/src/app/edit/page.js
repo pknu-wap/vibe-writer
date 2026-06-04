@@ -41,10 +41,10 @@ const DEFAULT_EMOTION_SETTINGS = {
 };
 
 const EMOTIONS = [
-  { name: "Happy", color: "#F5C000", desc: "통통체 · 65px" },
-  { name: "Angry", color: "#E03C3C", desc: "각진체 · 70px" },
-  { name: "Sad", color: "#4A9FE0", desc: "얇은체 · 45px" },
-  { name: "Neutral", color: "#FFFFFF", desc: "고딕 · 50px" },
+  { name: "Happy", color: "#F5C000", desc: "통통체 · 23px" },
+  { name: "Angry", color: "#E03C3C", desc: "각진체 · 23px" },
+  { name: "Sad", color: "#4A9FE0", desc: "얇은체 · 23px" },
+  { name: "Neutral", color: "#FFFFFF", desc: "고딕 · 23px" },
 ];
 
 const EFFECT_CLASS = {
