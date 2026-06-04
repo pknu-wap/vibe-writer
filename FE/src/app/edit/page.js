@@ -15,25 +15,25 @@ const EMOTION_COLORS = {
 
 const DEFAULT_EMOTION_SETTINGS = {
   Happy: {
-    fontSize: 65,
+    fontSize: 23,
     position: "하단",
     effect: "바운스",
     font: "통통체",
   },
   Angry: {
-    fontSize: 70,
+    fontSize: 23,
     position: "하단",
     effect: "쉐이크",
     font: "각진체",
   },
   Sad: {
-    fontSize: 45,
+    fontSize: 23,
     position: "하단",
     effect: "페이드",
     font: "얇은체",
   },
   Neutral: {
-    fontSize: 50,
+    fontSize: 23,
     position: "하단",
     effect: "없음",
     font: "고딕",
