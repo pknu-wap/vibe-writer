@@ -9,7 +9,7 @@ from pydub import AudioSegment
 sys.path.insert(0, os.path.dirname(__file__))
 from postprocess import fix_imbalance
 
-# ⭐ 모델은 import 시 1회만 로드 (요청마다 다시 로드 X)
+# 모델은 import 시 1회만 로드
 _model_whisper = whisper.load_model("medium")
 _model_emo = AutoModel(model="iic/emotion2vec_plus_base", hub="hf")
 
