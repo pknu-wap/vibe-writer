@@ -7,37 +7,12 @@ import { uploadStore } from "../lib/upload-store";
 export default function UploadPage() {
   const router = useRouter();
 
-  const handleFilechange = async (e) => {
+  const handleFilechange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("video", file);
-
-    try {
-      // 1. [수정] 외부 포트 직접 호출 대신 Next.js API 라우터 경유 (/api/upload)
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("업로드 실패");
-      }
-
-      // 2. [추가] 백엔드 응답 데이터 파싱 및 uploadStore에 video_id 저장
-      const data = await response.json();
-      if (data && data.video_id) {
-        uploadStore.videoInfo = { ...uploadStore.videoInfo, video_id: data.video_id };
-      }
-
-      // 성공 시 로딩 페이지로 이동
-      router.push("/loading");
-
-    } catch (error) {
-      console.error("Upload Error:", error);
-      alert("영상 업로드 중 오류가 발생했습니다.");
-    }
+    uploadStore.file = file;
+    router.push("/loading");
   };
 
   return (
@@ -63,13 +38,9 @@ export default function UploadPage() {
             </svg>
           </div>
 
-          <h2 className="upload-title">
-            영상을 여기에 첨부 해 주세요.
-          </h2>
+          <h2 className="upload-title">영상을 여기에 첨부 해 주세요.</h2>
 
-          <p className="upload-desc">
-            세로형(9:16), 60초 이내, MP4
-          </p>
+          <p className="upload-desc">세로형(9:16), 60초 이내, MP4</p>
 
           <input
             type="file"
@@ -79,10 +50,7 @@ export default function UploadPage() {
             onChange={handleFilechange}
           />
 
-          <label
-            htmlFor="video-upload"
-            className="upload-button"
-          >
+          <label htmlFor="video-upload" className="upload-button">
             영상 선택하기
           </label>
         </div>
