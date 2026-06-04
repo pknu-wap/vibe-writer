@@ -57,8 +57,12 @@ const EFFECT_CLASS = {
 const FONT_OPTIONS = ["통통체", "각진체", "얇은체", "고딕"];
 
 const formatTime = (seconds = 0) => {
-  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-  const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
   return `${m}:${s}`;
 };
 
@@ -119,18 +123,23 @@ export default function EditPage() {
   const scriptListRef = useRef(null);
 
   const [selectedEmotion, setSelectedEmotion] = useState("Happy");
-  const [emotionSettings, setEmotionSettings] = useState(DEFAULT_EMOTION_SETTINGS);
+  const [emotionSettings, setEmotionSettings] = useState(
+    DEFAULT_EMOTION_SETTINGS,
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [segments, setSegments] = useState(uploadStore.segments ?? []);
-  const [duration, setDuration] = useState(uploadStore.videoInfo?.duration ?? 0);
+  const [duration, setDuration] = useState(
+    uploadStore.videoInfo?.duration ?? 0,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const videoId = uploadStore.videoInfo?.video_id;
-  const videoSrc = videoId ? `/api/video/${videoId}` : "";
+  const videoSrc = videoId ? `http://34.64.111.6:8000/videos/${videoId}` : "";
 
-  const currentSetting = emotionSettings[selectedEmotion] ?? emotionSettings.Neutral;
+  const currentSetting =
+    emotionSettings[selectedEmotion] ?? emotionSettings.Neutral;
 
   const currentSegment =
     segments.find((seg) => currentTime >= seg.start && currentTime < seg.end) ??
@@ -138,7 +147,8 @@ export default function EditPage() {
 
   const captionEmotion = currentSegment?.emotion ?? selectedEmotion;
   const captionText = currentSegment?.text ?? "";
-  const captionSetting = emotionSettings[captionEmotion] ?? emotionSettings.Neutral;
+  const captionSetting =
+    emotionSettings[captionEmotion] ?? emotionSettings.Neutral;
 
   const updateCurrentEmotionSetting = (key, value) => {
     setEmotionSettings((prev) => ({
@@ -155,8 +165,8 @@ export default function EditPage() {
 
     setSegments((prev) =>
       prev.map((seg, index) =>
-        index === selectedIndex ? { ...seg, emotion } : seg
-      )
+        index === selectedIndex ? { ...seg, emotion } : seg,
+      ),
     );
   };
 
@@ -310,9 +320,7 @@ export default function EditPage() {
           <h1 className="logo-text">VIBE-WRITER</h1>
         </Link>
 
-        <p className="service-text">
-          AI 감정 기반 숏폼 자막 자동 생성 서비스
-        </p>
+        <p className="service-text">AI 감정 기반 숏폼 자막 자동 생성 서비스</p>
       </header>
 
       <div className="edit-body">
@@ -341,7 +349,7 @@ export default function EditPage() {
                 onChange={(e) =>
                   updateCurrentEmotionSetting(
                     "fontSize",
-                    Number(e.target.value)
+                    Number(e.target.value),
                   )
                 }
                 className="font-size-slider"
@@ -380,9 +388,7 @@ export default function EditPage() {
                     className={`pill-btn${
                       currentSetting.effect === item ? " selected" : ""
                     }`}
-                    onClick={() =>
-                      updateCurrentEmotionSetting("effect", item)
-                    }
+                    onClick={() => updateCurrentEmotionSetting("effect", item)}
                   >
                     {item}
                   </button>
@@ -495,9 +501,7 @@ export default function EditPage() {
               <div
                 className="progress-fill"
                 style={{
-                  width: duration
-                    ? `${(currentTime / duration) * 100}%`
-                    : "0%",
+                  width: duration ? `${(currentTime / duration) * 100}%` : "0%",
                 }}
               />
             </div>

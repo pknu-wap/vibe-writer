@@ -7,7 +7,7 @@ import TopNav from "../components/top-nav";
 
 const BLADE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
-const UPLOAD_API = "/api/upload";
+const UPLOAD_API = "http://34.64.111.6:8000/upload";
 const ANALYZE_API = "/api/analyze";
 
 const LOADING_MESSAGE = "AI가 감정을 분석하고 자막을 생성하는 중이에요";
@@ -89,7 +89,8 @@ export default function Loading() {
 
         uploadStore.videoInfo = {
           video_id: videoId,
-          duration: uploadResult.duration ?? uploadResult.videoInfo?.duration ?? 0,
+          duration:
+            uploadResult.duration ?? uploadResult.videoInfo?.duration ?? 0,
         };
 
         sessionStorage.setItem("uploadResult", JSON.stringify(uploadResult));
