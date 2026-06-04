@@ -125,6 +125,9 @@ def build_ass(segments: list[Segment]) -> str:
 # ── 메인 엔드포인트 ────────────────────────
 @router.post("/process")
 async def process_video(req: ProcessRequest):
+    if "/" in req.video_id or "\\" in req.video_id or ".." in req.video_id:
+        raise HTTPException(400, detail="Invalid video_id")
+
     video_path = UPLOAD_DIR / f"{req.video_id}.mp4"
     if not video_path.exists():
         raise HTTPException(404, detail="VIDEO_NOT_FOUND")
