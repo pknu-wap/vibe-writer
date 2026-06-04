@@ -2,7 +2,7 @@ import os
 import tempfile
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.concurrency import run_in_threadpool
-
+import logging
 from stt import analyze_stt
 from fastapi.middleware.cors import CORSMiddleware
 #서버 가동
@@ -47,16 +47,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# AI/main.py
-
-import os
-import tempfile
-import logging
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.concurrency import run_in_threadpool
-
-from stt import analyze_stt
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
