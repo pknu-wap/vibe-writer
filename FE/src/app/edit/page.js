@@ -256,8 +256,7 @@ export default function EditPage() {
 
     const finalPayload = {
       video_id: videoId,
-      subtitleFormat: "ass",
-      subtitles: subtitleData,
+      segments: subtitleData,
     };
 
     uploadStore.finalPayload = finalPayload;
@@ -267,7 +266,9 @@ export default function EditPage() {
     try {
       setIsSubmitting(true);
 
-      const response = await fetch("/api/final", {
+      console.log(JSON.stringify(finalPayload));
+
+      const response = await fetch("http://34.64.111.6:8000/process", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
