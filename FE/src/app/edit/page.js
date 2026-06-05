@@ -114,6 +114,7 @@ const makeSubtitlePayload = (segments, emotionSettings) => {
       font: setting.font,
       fontSize: setting.fontSize,
       position: setting.position,
+      effect: setting.effect,
     };
   });
 };
