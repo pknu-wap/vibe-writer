@@ -17,12 +17,11 @@ OUTPUT_ASS_DIR.mkdir(parents=True, exist_ok=True)
 # FE 미리보기 px값을 ASS 좌표(PlayResY=1920)로 키울 배수
 FONT_SIZE_SCALE = 4
 
-# 위치별 MarginV (ASS 좌표계 1920 기준)
 POSITION_MARGIN_V = {
-    "상단": 120,    # 위에서 약간 떨어진 곳
-    "중앙": 0,      # 정중앙
-    "하단": 500,    # 아래에서 좀 떨어진 곳
-    "top": 120, "middle": 0, "bottom": 600,
+    "상단": 120,
+    "중앙": 0,
+    "하단": 400,
+    "top": 120, "middle": 0, "bottom": 400,
 }
 
 POSITION_ALIGNMENT = {
@@ -39,6 +38,18 @@ FONT_MAP = {
     "고딕": "NanumGothic",
 }
 
+# 감정별 효과 → ASS 애니메이션 오버라이드 태그
+EFFECT_OVERRIDE = {
+    # 통통튀는 효과 (Happy): 살짝 페이드인 + 살짝 커졌다 돌아옴
+    "바운스": r"\fad(150,0)\t(0,200,\fscx115\fscy115)\t(200,400,\fscx100\fscy100)",
+    # 흔들리는 효과 (Angry): 좌우 회전으로 진동
+    "쉐이크": r"\t(0,80,\frz4)\t(80,160,\frz-4)\t(160,240,\frz4)\t(240,320,\frz-4)\t(320,400,\frz0)",
+    # 페이드인/아웃 (Sad): 부드럽게 나타났다 사라짐
+    "페이드": r"\fad(400,400)",
+    # 효과 없음
+    "없음": "",
+}
+
 
 class Segment(BaseModel):
     start: float
@@ -49,9 +60,9 @@ class Segment(BaseModel):
     font: Optional[str] = "고딕"
     fontSize: Optional[int] = 50
     position: Optional[str] = "하단"
+    effect: Optional[str] = "없음"
 
 
-# ⭐ segments 또는 subtitles 둘 다 받아들임 (FE 코드 어느 쪽이어도 OK)
 class ProcessRequest(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -107,17 +118,20 @@ def build_ass(segments):
         font_name = FONT_MAP.get(seg.font or "고딕", "NanumGothic")
         pos_key = seg.position or "하단"
         alignment = POSITION_ALIGNMENT.get(pos_key, 2)
-        margin_v = POSITION_MARGIN_V.get(pos_key, 200)
+        margin_v = POSITION_MARGIN_V.get(pos_key, 400)
         font_size = (seg.fontSize or 20) * FONT_SIZE_SCALE
+        effect_tag = EFFECT_OVERRIDE.get(seg.effect or "없음", "")
 
-        # 인라인으로 alignment/font/size/color/marginV 모두 오버라이드
-        # MarginV는 \pos 또는 별도 dialogue MarginV 필드로 제어 가능
         override = (
-            f"{{\\an{alignment}\\fn{font_name}\\fs{font_size}\\c{color_ass}}}"
+            f"{{\\an{alignment}"
+            f"\\fn{font_name}"
+            f"\\fs{font_size}"
+            f"\\c{color_ass}"
+            f"{effect_tag}"
+            f"}}"
         )
         text = seg.text.replace("\n", "\\N").replace("\r", "")
 
-        # Dialogue 라인의 MarginV 필드 (8번째)를 위치별로 다르게
         lines.append(
             f"Dialogue: 0,{start_t},{end_t},Default,,0,0,{margin_v},,{override}{text}"
         )
