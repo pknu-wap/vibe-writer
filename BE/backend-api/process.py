@@ -22,7 +22,7 @@ POSITION_MARGIN_V = {
     "상단": 120,    # 위에서 약간 떨어진 곳
     "중앙": 0,      # 정중앙
     "하단": 500,    # 아래에서 좀 떨어진 곳
-    "top": 120, "middle": 0, "bottom": 600,
+    "top": 120, "middle": 0, "bottom": 500,
 }
 
 POSITION_ALIGNMENT = {
