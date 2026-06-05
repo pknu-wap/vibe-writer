@@ -3,7 +3,7 @@ import sys
 import subprocess
 from pathlib import Path
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 
 router = APIRouter()
@@ -14,19 +14,29 @@ OUTPUT_ASS_DIR = Path(os.path.dirname(__file__)) / "output" / "subtitles"
 OUTPUT_VIDEO_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_ASS_DIR.mkdir(parents=True, exist_ok=True)
 
-# FE 미리보기 픽셀값을 ASS 좌표(PlayResY=1920)로 변환할 때 곱하는 배수
-FONT_SIZE_SCALE = 3
+# FE 미리보기 px값을 ASS 좌표(PlayResY=1920)로 키울 배수
+FONT_SIZE_SCALE = 4
+
+# 위치별 MarginV (ASS 좌표계 1920 기준)
+POSITION_MARGIN_V = {
+    "상단": 120,    # 위에서 약간 떨어진 곳
+    "중앙": 0,      # 정중앙
+    "하단": 200,    # 아래에서 좀 떨어진 곳
+    "top": 120, "middle": 0, "bottom": 200,
+}
+
+POSITION_ALIGNMENT = {
+    "상단": 8,
+    "중앙": 5,
+    "하단": 2,
+    "top": 8, "middle": 5, "bottom": 2, "center": 5,
+}
 
 FONT_MAP = {
     "통통체": "NanumGothic",
     "각진체": "NanumGothic",
     "얇은체": "NanumGothic",
     "고딕": "NanumGothic",
-}
-
-POSITION_MAP = {
-    "상단": 8, "중앙": 5, "하단": 2,
-    "top": 8, "middle": 5, "bottom": 2, "center": 5,
 }
 
 
@@ -41,9 +51,12 @@ class Segment(BaseModel):
     position: Optional[str] = "하단"
 
 
+# ⭐ segments 또는 subtitles 둘 다 받아들임 (FE 코드 어느 쪽이어도 OK)
 class ProcessRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     video_id: str
-    subtitles: list[Segment]
+    subtitles: list[Segment] = Field(default_factory=list, alias="segments")
 
 
 def hex_to_ass_color(hex_color: str) -> str:
@@ -79,8 +92,8 @@ def build_ass(segments):
         "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
         "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
         "Alignment, MarginL, MarginR, MarginV, Encoding\n"
-        "Style: Default,NanumGothic,60,&H00FFFFFF,&H000000FF,&H00000000,"
-        "&H80000000,0,0,0,0,100,100,0,0,1,3,1,2,40,40,80,1\n\n"
+        "Style: Default,NanumGothic,80,&H00FFFFFF,&H000000FF,&H00000000,"
+        "&H80000000,0,0,0,0,100,100,0,0,1,3,1,2,40,40,200,1\n\n"
         "[Events]\n"
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, "
         "Effect, Text\n"
@@ -92,17 +105,21 @@ def build_ass(segments):
         end_t = to_ass_time(seg.end)
         color_ass = hex_to_ass_color(seg.color or "#FFFFFF")
         font_name = FONT_MAP.get(seg.font or "고딕", "NanumGothic")
-        alignment = POSITION_MAP.get(seg.position or "하단", 2)
-
-        # FE 픽셀값 → ASS 좌표로 스케일업
+        pos_key = seg.position or "하단"
+        alignment = POSITION_ALIGNMENT.get(pos_key, 2)
+        margin_v = POSITION_MARGIN_V.get(pos_key, 200)
         font_size = (seg.fontSize or 20) * FONT_SIZE_SCALE
 
+        # 인라인으로 alignment/font/size/color/marginV 모두 오버라이드
+        # MarginV는 \pos 또는 별도 dialogue MarginV 필드로 제어 가능
         override = (
             f"{{\\an{alignment}\\fn{font_name}\\fs{font_size}\\c{color_ass}}}"
         )
         text = seg.text.replace("\n", "\\N").replace("\r", "")
+
+        # Dialogue 라인의 MarginV 필드 (8번째)를 위치별로 다르게
         lines.append(
-            f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{override}{text}"
+            f"Dialogue: 0,{start_t},{end_t},Default,,0,0,{margin_v},,{override}{text}"
         )
 
     return "\n".join(lines) + "\n"
